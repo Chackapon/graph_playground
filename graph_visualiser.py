@@ -72,6 +72,7 @@ class GraphVisualiser:
 
         plt.title("Implementation: " + self.implementation, fontsize=20)
         plt.figtext(0.5, 0.07, "Directed: " + str(self.directed), ha="center")
+        os.system("mkdir -p img")
         plt.savefig("img/" + self.filename + ".png")
         plt.close()
 
