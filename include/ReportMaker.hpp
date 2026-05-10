@@ -18,6 +18,7 @@ class ReportMaker {
     public:
     explicit ReportMaker(const std::string& directory) {
         this->report_id = ++report_counter;
+        system(("mkdir -p "+directory).c_str());
         this->report_file.open(directory + "/report_" + std::to_string(this->report_id) + ".log");
     }
     ~ReportMaker() {

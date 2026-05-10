@@ -52,6 +52,7 @@ public:
 
 
     void get_json(const std::string &filename) const {
+        system("mkdir -p json");
         std::ofstream file(filename);
         file << R"({"graph": {"implementation": ")" << graph_implementation();
         file <<  R"(", "directed": ")" << (is_directed() ? "True" : "False");

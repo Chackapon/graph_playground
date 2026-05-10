@@ -23,6 +23,9 @@ all: $(TARGET)
 run: $(TARGET)
 	./$(TARGET)
 
+.PHONY: test_graphs
+test_graphs: clean_json clean_img run
+
 .PHONY: visualise
 visualise:
 	.venv/bin/python3 graph_visualiser.py
@@ -30,6 +33,7 @@ visualise:
 .PHONY: clean
 clean:
 	rm -f tests/*.o $(TARGET)
+	rm -f lib/*.o $(TARGET)
 
 .PHONY: clean_json
 clean_json:
@@ -38,3 +42,7 @@ clean_json:
 .PHONY: clean_img
 clean_img:
 	rm -f img/*
+
+.PHONY: clean_reports
+clean_img:
+	rm -f raport/*
