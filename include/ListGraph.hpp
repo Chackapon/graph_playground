@@ -23,14 +23,14 @@ class ListGraph final : public BaseGraph<T> { // wersja5c
     std::string nodes_to_json() const override {
         std::string result = "";
         for (auto root : adj_list) {
-            result += "\"" + std::to_string(root.first) + "\":[";
+            result += "\"" + std::to_string(root.first) + "\":{";
             for (const auto &neighbor : root.second) {
                 if (neighbor != nullptr) {
-                    result += "{\"target\": \"" + std::to_string(neighbor->target) + "\", \"weight\":" + std::to_string(neighbor->weight) + "},";
+                    result += "\"" + std::to_string(neighbor->target) + "\":" + std::to_string(neighbor->weight) + ",";
                 }
             }
             if (!result.empty() && result.back() == ',') result.pop_back();
-            result += "],";
+            result += "},";
         }
         if (!result.empty() && result.back() == ',') result.pop_back();
         return result;

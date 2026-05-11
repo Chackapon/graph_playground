@@ -22,16 +22,17 @@ class MatrixGraph final : public BaseGraph<int> { // wersja 7x
         std::string result;
         for (int v = 0; v < adj_matrix.size(); ++v) {
             if (has_node(v)) {
-                result += "\"" + std::to_string(v) + "\":[";
+                result += "\"" + std::to_string(v) + "\":{";
 
                 for (const auto &neighbor : adj_matrix[v]) {
                     if (neighbor != nullptr  && neighbor->weight != 0) {
-                        result += R"({"target": ")" + std::to_string(neighbor->target) + R"(", "weight":)" + std::to_string(neighbor->weight) + "},";
+//                        result += R"({"target": ")" + std::to_string(neighbor->target) + R"(", "weight":)" + std::to_string(neighbor->weight) + "},";
+                          result += "\"" + std::to_string(neighbor->target) + "\":" + std::to_string(neighbor->weight) + ",";
                     }
                 }
                 if (result.back() == ',') result.pop_back();
 
-                result += "],";
+                result += "},";
             }
         }
         if (result.back() == ',') result.pop_back();

@@ -39,9 +39,11 @@ class GraphVisualiser:
         # print(self.graph.edges)
 
         try:
-            pos = nx_layouts["planar"](self.graph)
+            pos = nx_layouts["shell"](self.graph)
         except nx.NetworkXException:
             pos = nx_layouts["shell"](self.graph)
+
+        fig, ax = plt.subplots(figsize=(6, 4))
         # pos = nx.spring_layout(self.graph, k=0.8, iterations=50, scale=2)
 
         # Handle nodes
@@ -49,25 +51,55 @@ class GraphVisualiser:
         nx.draw_networkx_labels(self.graph, pos=pos)
 
         # Handle edges
+        visited = set()
         one_directional = []
         bidirectional = []
-        # for (v,u) in self.graph.edges():
-        #     if (u, v) in self.graph.edges():
-        #         if self.directed:
-        #             bidirectional.append((v, u))
-        #         else:
-        #             one_directional.append((v, u))
-        #     else:
-        #         one_directional.append( (v,u) )
+        for (v,u) in self.graph.edges():
+            # print()
+            # print(self.graph.edges, )
+            # print( visited )
+            # print( (v,u), (u, v) in self.graph.edges(), (v,u) not in visited )
+            # print(bidirectional)
+            if (v,u) not in visited:
+                if (u, v) in self.graph.edges():
+                    print(self.data)
+                    if self.directed and self.data[u][v] != self.data[v][u]:
+                        bidirectional.append((v, u))
+                        bidirectional.append((u, v))
+                        visited.add( (u,v) )
+                    else:
+                        one_directional.append((v, u))
+                else:
+                    one_directional.append( (v,u) )
+                    pass
+                visited.add( (v,u) )
 
-        one_directional = self.graph.edges
+        # one_directional = self.graph.edges
 
         nx.draw_networkx_edges(self.graph, pos=pos, edgelist=one_directional)
-        nx.draw_networkx_edges(self.graph, pos=pos, edgelist=bidirectional, connectionstyle="arc3,rad=0.15")
+        nx.draw_networkx_edges(self.graph, pos=pos, edgelist=bidirectional, connectionstyle="arc3,rad=0.05")
 
 
-        edge_labels = nx.get_edge_attributes(self.graph, "weight")
-        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels)
+        # edge_labels = nx.get_edge_attributes(self.graph, "weight")
+        mono_edge_labels = {
+            edge: weight
+            for edge, weight in nx.get_edge_attributes(self.graph, "weight").items()
+            if edge in one_directional
+        }
+        bi_edge_labels = {
+            edge: "<->"
+            for edge, weight in nx.get_edge_attributes(self.graph, "weight").items()
+            if edge in bidirectional
+        }
+
+        label_bounding_box = dict(
+            facecolor="white",
+            edgecolor="none",
+            alpha=0.75,
+            pad=1
+        )
+        nx.draw_networkx_edge_labels(self.graph, pos, mono_edge_labels, font_size=8, bbox=label_bounding_box)
+        nx.draw_networkx_edge_labels(self.graph, pos, bi_edge_labels, font_size=8, bbox=label_bounding_box) #TODO fix this
 
 
         plt.title("Implementation: " + self.implementation, fontsize=20)
@@ -86,10 +118,10 @@ class GraphVisualiser:
                 self.implementation = data['graph']['implementation']
                 self.directed = data['graph']['directed']
 
+                # print(self.data); quit()
                 for source in self.data.keys():
-                    for target in self.data[source]:
-                        # print([source, target['target'], target['weight']])
-                        self.addEdge(source, target['target'], target['weight'])
+                    for target in self.data[source].keys():
+                        self.addEdge(source, target, self.data[source][target])
                     if len(self.data[source]) == 0:
                         self.addNode(source)
 
