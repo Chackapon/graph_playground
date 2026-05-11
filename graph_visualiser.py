@@ -80,17 +80,26 @@ class GraphVisualiser:
         nx.draw_networkx_edges(self.graph, pos=pos, edgelist=bidirectional, connectionstyle="arc3,rad=0.05")
 
 
+        # Handle edge labels
         # edge_labels = nx.get_edge_attributes(self.graph, "weight")
         mono_edge_labels = {
             edge: weight
             for edge, weight in nx.get_edge_attributes(self.graph, "weight").items()
             if edge in one_directional
         }
-        bi_edge_labels = {
-            edge: "<->"
-            for edge, weight in nx.get_edge_attributes(self.graph, "weight").items()
-            if edge in bidirectional
-        }
+
+        visited = set()
+        bi_edge_labels = {}
+        for bi_edge in bidirectional:
+            if bi_edge not in visited and tuple(reversed(bi_edge)) not in visited:
+                bi_edge_labels[bi_edge] = f"{self.data[bi_edge[1]][bi_edge[0]]}<->{self.data[bi_edge[0]][bi_edge[5]]}"
+                visited.add(bi_edge)
+        # quit()
+        # bi_edge_labels = {
+        #     edge: ""# edge: f"{vu_weight}<->{uv_veight}"
+        #     for edge, weight in nx.get_edge_attributes(self.graph, "weight").items()
+        #     if edge in bidirectional
+        # }
 
         label_bounding_box = dict(
             facecolor="white",
