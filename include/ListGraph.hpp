@@ -12,6 +12,8 @@
 #include "HelperFunctions.hpp"
 #include "GraphExceptions.hpp"
 
+#include "GraphIterator.hpp"
+
 
 // graph.hpp
 template <typename T>
@@ -168,6 +170,54 @@ public:
             }
         }
     }
+
+
+    // ===================== NODE ITERATOR =====================
+    // TODO consider making virtual class in base class
+    class NodeIterator final : GraphIterator<T> {
+        ListGraph* graph;
+        int node_idx;
+    public:
+        explicit NodeIterator(ListGraph* graph, const int idx = 0) : graph(graph), node_idx(idx) {}
+        ~NodeIterator() override = default;
+        NodeIterator& operator=(const NodeIterator& other) = default;
+
+        T operator*() const override {
+            auto it = graph->adj_list.begin();
+            for (int i = 0; i < node_idx; ++i) ++it;
+            auto val = (*it).first;
+            return val;
+        }
+
+        NodeIterator& operator++() override {
+            ++node_idx;
+            return *this;
+        }
+        NodeIterator operator++(int) {
+            NodeIterator temp = *this;
+            ++node_idx;
+            return temp;
+        }
+
+        bool operator==(const NodeIterator& other) {
+            return graph == other.graph && node_idx == other.node_idx;
+        }
+        bool operator!=(const NodeIterator& other) {
+            return graph != other.graph || node_idx != other.node_idx;
+        };
+        void increment() { ++node_idx; }
+
+    };
+    NodeIterator node_begin() { return NodeIterator(this, 0); } // lub bez zera
+    NodeIterator node_end() { return NodeIterator(this, v()); }
+    // TODO consider moving to base class
+    struct Nodes {
+        ListGraph<T>* graph;
+        explicit Nodes(ListGraph<T>* graph): graph(graph) {};
+        NodeIterator begin() const { return graph->node_begin(); }
+        NodeIterator end() const { return graph->node_end(); }
+    };
+    Nodes nodes() { return Nodes(this); }
 
 
 

@@ -8,6 +8,8 @@
 
 constexpr int N = 10;
 
+
+/*
 void try_adding_edge(BaseGraph<int> *graph, const Edge<int>& edge, ReportMaker& r) {
     try {
         graph->add_edge( edge );
@@ -16,26 +18,14 @@ void try_adding_edge(BaseGraph<int> *graph, const Edge<int>& edge, ReportMaker& 
         r.silent_suberror("Couldn't add edge " + str(edge.source) + "->" + str(edge.target) + ": " + e.what() );
     }
 }
-
-void try_generate_random_nodes(BaseGraph<int>* graph, const int n, ReportMaker* report = nullptr, std::vector<int>* generated = nullptr) {
-    for (int i = 0; i < n; ++i) { //add nodes with random values
-        const int node = rand_int(n);
-        try {
-            graph->add_node( node );
-            if (generated != nullptr) generated->push_back( node ); //won't be neede with iterators
-        } catch (const std::exception& e) {
-            if (report != nullptr) report->silent_suberror("Couldn't add node "+str(node)+": "+e.what());
-        }
-
-    }
-}
-
+// TODO create a class that automatically makes a raport file while also displaying shorter info onto the terminal. Should support markers like test labeling with numbers
 void testGraph(BaseGraph<int>* graph) {
     ReportMaker report("raport");
     std::ostringstream graph_id;
     graph_id << graph->graph_implementation() << "@" << (void*)graph;
 
 
+    // TODO implement raport header
     report.header( "Testing \"" + graph->graph_implementation() + "\" at address " + str((void *)graph) );
     report.log( "Is graph directed? " + yn(graph->is_directed()) );
 
@@ -44,8 +34,16 @@ void testGraph(BaseGraph<int>* graph) {
     std::vector<int> generated_nodes; // zastanowic sie czy nie da sie tego zrobic lepiej!!!
     // std::cout << "* Testing add_node()" << std::endl;
     report.log("Testing add_node()");
-    try_generate_random_nodes(graph, N, &report, &generated_nodes);
+    for (int i = 0; i < N; ++i) { //add nodes with random values
+        const int node = rand_int(N);
+        try {
+            graph->add_node( node );
+            generated_nodes.push_back( node );
+        } catch (const std::exception& e) {
+            report.silent_suberror("Couldn't add node "+str(node)+": "+e.what());
+        }
 
+    }
     report.sublog( "Generated nodes: " + str(generated_nodes) + " (plus additionaly 0 and " + str(N-1) + " for testing purposes" );
     // std::cout << "(this number may not equal to amount of final nodes, ass add_edge() can add the target node if it doesn't exist)" << std::endl;
 
@@ -151,19 +149,44 @@ void testGraph(BaseGraph<int>* graph) {
     std::cout << "\n" << std::endl;
 
 }
+*/
+
+void try_generate_random_nodes(BaseGraph<int>* graph, const int n, ReportMaker* report = nullptr, std::vector<int>* generated = nullptr) {
+    for (int i = 0; i < n; ++i) { //add nodes with random values
+        const int node = rand_int(n);
+        try {
+            graph->add_node( node );
+            if (generated != nullptr) generated->push_back( node ); //won't be neede with iterators
+        } catch (const std::exception& e) {
+            if (report != nullptr) report->silent_suberror("Couldn't add node "+str(node)+": "+e.what());
+        }
+
+    }
+}
+
 
 int main() {
     rand_init();
 
-    std::list< BaseGraph<int>* > graph_collection;
-    graph_collection.push_back( new ListGraph<int>(true) );
-    graph_collection.push_back( new ListGraph<int>(false) );
-    graph_collection.push_back( new MatrixGraph(N, true) );
-    graph_collection.push_back( new MatrixGraph(N, false) );
+    // std::list< BaseGraph<int>* > graph_collection;
+    // graph_collection.push_back( new ListGraph<int>(true) );
+    // graph_collection.push_back( new ListGraph<int>(false) );
+    // graph_collection.push_back( new MatrixGraph(N, true) );
+    // graph_collection.push_back( new MatrixGraph(N, false) );
+    //
+    //
+    // for (const auto graph : graph_collection) testGraph(graph);
+    std::vector<int> generated_nodes; // zastanowic sie czy nie da sie tego zrobic lepiej!!!
+    const auto list_graph = new ListGraph<int>();
+    ReportMaker report("trash", "iterator_report");
+    try_generate_random_nodes(list_graph, N, &report, &generated_nodes);
+    report.log("Generated random nodes");
+    report.sublog( "Read from log vector: " + str(generated_nodes) );
+    report.sublog( "Read using iterator: " + str(list_graph->nodes()) ); // TODO fix const char conversion for str() function (currently displays pointer)
 
 
-    for (const auto graph : graph_collection) testGraph(graph);
 
 
+    delete list_graph;
     return 0;
 }
