@@ -20,10 +20,10 @@ CLASS_TEST_EXE = GraphTester.x
 ITERATOR_TEST_EXE = IteratorTester.x
 
 
-$(CLASS_TEST_EXE): $(OBJ) $(CLASS_TEST_OBJ)
+$(CLASS_TEST_EXE): $(OBJ) $(CLASS_TEST_OBJ) $(INCLUDE)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(CLASS_TEST_OBJ) -o $(CLASS_TEST_EXE)
 
-$(ITERATOR_TEST_EXE): $(OBJ) $(ITERATOR_TEST_OBJ)
+$(ITERATOR_TEST_EXE): $(OBJ) $(ITERATOR_TEST_OBJ) $(INCLUDE)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(ITERATOR_TEST_OBJ) -o $(ITERATOR_TEST_EXE)
 
 
@@ -45,7 +45,7 @@ iterator_test: $(ITERATOR_TEST_EXE)
 test_graphs: clean_json clean_img class_test
 
 .PHONY: test_iterators
-test_graphs: clean_json clean_img iterator_test
+test_iterators: clean_json clean_img iterator_test
 
 
 # PYTHON
