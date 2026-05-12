@@ -16,10 +16,10 @@ class ReportMaker {
     static int report_counter;
 
     public:
-    explicit ReportMaker(const std::string& directory) {
+    explicit ReportMaker(const std::string& directory = ".", const std::string& filename = "report") {
         this->report_id = ++report_counter;
         system(("mkdir -p "+directory).c_str());
-        this->report_file.open(directory + "/report_" + std::to_string(this->report_id) + ".log");
+        this->report_file.open(directory + "/" + filename + "" + std::to_string(this->report_id) + ".log");
     }
     ~ReportMaker() {
         this->report_file.close();
