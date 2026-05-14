@@ -81,6 +81,7 @@ class GraphVisualiser:
 
 
         # Handle edge labels
+        # TODO cleanup
         # edge_labels = nx.get_edge_attributes(self.graph, "weight")
         mono_edge_labels = {
             edge: weight

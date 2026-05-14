@@ -1,7 +1,7 @@
 .SUFFIXES: .cpp .x .o .json
 
 CXX = g++
-CXXFLAGS = -std=c++11 -pedantic -Wall
+CXXFLAGS = -std=c++20 -pedantic -Wall
 #LD = $(CXX)
 #LFLAGS = -Wall -std=c++11 -pedantic -O
 
