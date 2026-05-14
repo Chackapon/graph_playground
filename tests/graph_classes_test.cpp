@@ -30,6 +30,17 @@ void try_generate_random_nodes(BaseGraph<int>* graph, const int n, ReportMaker* 
     }
 }
 
+void try_generate_random_edges(BaseGraph<int>* graph, ReportMaker* report, std::vector<int>* generated_nodes) {
+    const int edges_to_add = rand_int(N) + (N);
+
+    for (int i = 0; i < edges_to_add; ++i) {
+        // add random edges
+        const int source = generated_nodes->at( rand_int( (int)generated_nodes->size() ) );
+        const int target = generated_nodes->at( rand_int( (int)generated_nodes->size() ) );
+        try_adding_edge(graph,  Edge<int>(source, target, round_float( rand_float(), 2 )), *report);
+    }
+}
+
 void testGraph(BaseGraph<int>* graph) {
     ReportMaker report("raport");
     std::ostringstream graph_id;
@@ -52,14 +63,7 @@ void testGraph(BaseGraph<int>* graph) {
 
 
     report.log( "Testing add_edge()" );
-    const int edges_to_add = rand_int(N) + (N);
-
-    for (int i = 0; i < edges_to_add; ++i) {
-        // add random edges
-        const int source = generated_nodes[ rand_int( (int)generated_nodes.size() ) ] ;
-        const int target = generated_nodes[ rand_int( (int)generated_nodes.size() ) ] ;
-        try_adding_edge(graph,  Edge<int>(source, target, round_float( rand_float(), 2 )), report);
-    }
+    try_generate_random_edges(graph, &report, &generated_nodes);
     try_adding_edge(graph,  Edge<int>(0, N-1, rand_int(N)), report);
     try_adding_edge(graph,  Edge<int>(N-1, 0, rand_int(N)), report);
 
