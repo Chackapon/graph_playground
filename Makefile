@@ -60,6 +60,8 @@ test_iterators: clean_json clean_img iterator_test
 .PHONY: test_bfs
 test_bfs: clean_json clean_img bfs_test
 
+all: $(CLASS_TEST_EXE) $(ITERATOR_TEST_EXE) $(CLASS_TEST_EXE)
+
 
 # PYTHON
 .PHONY: visualise
