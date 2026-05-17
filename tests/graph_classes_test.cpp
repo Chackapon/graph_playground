@@ -22,7 +22,7 @@ void try_generate_random_nodes(BaseGraph<int>* graph, const int n, ReportMaker* 
         const int node = rand_int(n);
         try {
             graph->add_node( node );
-            if (generated != nullptr) generated->push_back( node ); //won't be neede with iterators
+            if (generated != nullptr) generated->push_back( node ); //won't be needed with iterators
         } catch (const std::exception& e) {
             if (report != nullptr) report->silent_suberror("Couldn't add node "+str(node)+": "+e.what());
         }
@@ -51,7 +51,7 @@ void testGraph(BaseGraph<int>* graph) {
 
 
     report.run_test("add_node(), add_edge() and display()");
-    std::vector<int> generated_nodes; // zastanowic sie czy nie da sie tego zrobic lepiej!!!
+    std::vector<int> generated_nodes; // zastanowic się czy nie da się tego zrobic lepiej!!!
     // std::cout << "* Testing add_node()" << std::endl;
     report.log("Testing add_node()");
     try_generate_random_nodes(graph, N, &report, &generated_nodes);
