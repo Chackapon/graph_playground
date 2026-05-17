@@ -201,6 +201,69 @@ public:
         }
 
     }
+
+    // ===================== NODE ITERATOR =====================
+    class NodeIterator final {
+        MatrixGraph* graph;
+        int node_idx;
+    public:
+        explicit NodeIterator(MatrixGraph* graph, const int idx = 0) : graph(graph), node_idx(idx) {}
+        ~NodeIterator() = default;
+        NodeIterator& operator=(const NodeIterator& other) = default;
+
+        // TODO finish this
+        int operator*() const {
+            int valid_nodes_counter = -1;
+            // std::cout << "Node idx: " << node_idx << std::endl;
+            int node_it = -1;
+            do {
+                // if (node_it == graph->v()) { exit(1); }
+                // ++node_it;
+                // std::cout << "\tNode iterator: " << node_it << std::endl;
+                // std::cout << "\tNode idx: " << node_idx << std::endl;
+
+                if ( graph->has_node( ++node_it ) ) { ++valid_nodes_counter; }
+                // std::cout << "\tValid: " << valid_nodes_counter << std::endl;
+
+
+            } while (valid_nodes_counter != node_idx);
+            return node_it;
+        }
+
+        NodeIterator& operator++() {
+            ++node_idx;
+            return *this;
+        }
+        NodeIterator operator++(int) {
+            NodeIterator temp = *this;
+            ++node_idx;
+            return temp;
+        }
+
+        bool operator==(const NodeIterator& other) const {
+            return graph == other.graph && node_idx == other.node_idx;
+        }
+        bool operator!=(const NodeIterator& other) const {
+            return graph != other.graph || node_idx != other.node_idx;
+        };
+        void increment() { ++node_idx; }
+
+    };
+    NodeIterator node_begin() { return NodeIterator(this, 0); } // lub bez zera
+    NodeIterator node_end() { return NodeIterator(this, v()); }
+    struct Nodes {
+        MatrixGraph* graph;
+        explicit Nodes(MatrixGraph* graph): graph(graph) {};
+        NodeIterator begin() const { return graph->node_begin(); }
+        NodeIterator end() const { return graph->node_end(); }
+    };
+    Nodes nodes() { return Nodes(this); }
+    int random_node() override {
+        auto start = node_begin();
+        const int r = rand_int( v() );
+        for (int i = 0; i < r; ++i) { ++start; }
+        return *start;
+    }
 };
 
 

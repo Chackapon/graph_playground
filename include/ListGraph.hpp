@@ -173,23 +173,22 @@ public:
 
 
     // ===================== NODE ITERATOR =====================
-    // TODO consider making virtual class in base class
-    class NodeIterator final : GraphIterator<T> {
+    class NodeIterator final {
         ListGraph* graph;
         int node_idx;
     public:
         explicit NodeIterator(ListGraph* graph, const int idx = 0) : graph(graph), node_idx(idx) {}
-        ~NodeIterator() override = default;
+        ~NodeIterator() = default;
         NodeIterator& operator=(const NodeIterator& other) = default;
 
-        T operator*() const override {
+        T operator*() const {
             auto it = graph->adj_list.begin();
             for (int i = 0; i < node_idx; ++i) ++it;
             auto val = (*it).first;
             return val;
         }
 
-        NodeIterator& operator++() override {
+        NodeIterator& operator++() {
             ++node_idx;
             return *this;
         }
@@ -199,10 +198,10 @@ public:
             return temp;
         }
 
-        bool operator==(const NodeIterator& other) {
+        bool operator==(const NodeIterator& other) const {
             return graph == other.graph && node_idx == other.node_idx;
         }
-        bool operator!=(const NodeIterator& other) {
+        bool operator!=(const NodeIterator& other) const {
             return graph != other.graph || node_idx != other.node_idx;
         };
         void increment() { ++node_idx; }
@@ -210,7 +209,6 @@ public:
     };
     NodeIterator node_begin() { return NodeIterator(this, 0); } // lub bez zera
     NodeIterator node_end() { return NodeIterator(this, v()); }
-    // TODO consider moving to base class
     struct Nodes {
         ListGraph<T>* graph;
         explicit Nodes(ListGraph<T>* graph): graph(graph) {};
@@ -218,7 +216,12 @@ public:
         NodeIterator end() const { return graph->node_end(); }
     };
     Nodes nodes() { return Nodes(this); }
-
+    T random_node() override {
+        auto start = node_begin();
+        const int r = rand_int( v() );
+        for (int i = 0; i < r; ++i) { ++start; }
+        return *start;
+    }
 
 
 

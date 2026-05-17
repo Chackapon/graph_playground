@@ -62,6 +62,8 @@ public:
         file.close();
     }
 
+    virtual T random_node() = 0;
+
 
 };
 

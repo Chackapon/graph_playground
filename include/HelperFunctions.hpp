@@ -27,7 +27,7 @@ inline std::string str(const void* arg) {
 }
 
 template <typename T>
-typename std::enable_if< std::is_arithmetic<T>::value, std::string >::type str( T arg ) {
+auto str( T arg ) -> std::enable_if_t< std::is_arithmetic_v<T>, std::string >  {
     return std::to_string( arg );
 }
 
