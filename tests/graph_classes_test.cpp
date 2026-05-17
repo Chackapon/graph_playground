@@ -69,7 +69,7 @@ void testGraph(BaseGraph<int>* graph) {
     report.sublog( "Generated graph has " + str(graph->v()) + " nodes and " + str(graph->e()) + " edges" );
 
     report.silent_log("Exporting to json");
-    graph->get_json( "json/"+graph_id.str()+"_before_operations.json" );
+    graph->get_json( "json/"+graph_id.str()+"_before_operations.json" ); // TODO make directory an argument of this function
     report.line();
 
 
