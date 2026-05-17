@@ -11,6 +11,15 @@
 
 #include "Edge.hpp"
 
+template <typename G>
+concept HasNodes = requires(G graph) { graph.nodes(); };
+template <typename G, typename T>
+concept HasAdjacents = requires(G graph, T node) { graph.adjacents(node); };
+
+template <typename G, typename T>
+concept Graph = HasNodes<G> && HasAdjacents<G, T>;
+
+
 template <typename T>
 class BaseGraph { // abstract class
 

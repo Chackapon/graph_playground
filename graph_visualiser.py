@@ -62,7 +62,7 @@ class GraphVisualiser:
             # print(bidirectional)
             if (v,u) not in visited:
                 if (u, v) in self.graph.edges():
-                    print(self.data)
+                    # print(self.data)
                     if self.directed and self.data[u][v] != self.data[v][u]:
                         bidirectional.append((v, u))
                         bidirectional.append((u, v))
@@ -93,7 +93,7 @@ class GraphVisualiser:
         bi_edge_labels = {}
         for bi_edge in bidirectional:
             if bi_edge not in visited and tuple(reversed(bi_edge)) not in visited:
-                bi_edge_labels[bi_edge] = f"{self.data[bi_edge[1]][bi_edge[0]]}<->{self.data[bi_edge[0]][bi_edge[5]]}"
+                bi_edge_labels[bi_edge] = f"{self.data[bi_edge[1]][bi_edge[0]]}<->{self.data[bi_edge[0]][bi_edge[1]]}"
                 visited.add(bi_edge)
         # quit()
         # bi_edge_labels = {
