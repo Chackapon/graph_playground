@@ -5,7 +5,7 @@
 #include "../include/ListGraph.hpp"
 #include "../include/ReportMaker.hpp"
 #include "../include/HelperFunctions.hpp"
-#include "../other/BFS.h"
+#include "../include/BFS.hpp"
 
 #include <format>
 #include <iostream>
@@ -113,10 +113,13 @@ void main_test(ListGraph<int>* graph) {
 
 int main() {
     rand_init();
-    const auto graph = new ListGraph<int>(false);
 
-    main_test(graph);
+    std::vector< ListGraph<int>* > graphs;
+    graphs.push_back(new ListGraph<int>(false));
 
-    delete graph;
+    for (const auto graph : graphs) {
+        main_test(graph);
+    }
+
     return 0;
 }
