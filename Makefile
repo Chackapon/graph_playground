@@ -10,6 +10,7 @@ TESTS_SRC = $(wildcard tests/*.cpp)
 CLASS_TEST_SRC = tests/graph_classes_test.cpp
 ITERATOR_TEST_SRC = tests/graph_iterator_test.cpp
 BFS_TEST_SRC = tests/graph_bfs_test.cpp
+DFS_TEST_SRC = tests/graph_dfs_test.cpp
 
 INCLUDE = $( wildcard include/*.hpp )
 
@@ -17,10 +18,12 @@ OBJ = $(SRC:.cpp=.o)
 CLASS_TEST_OBJ = $(CLASS_TEST_SRC:.cpp=.o)
 ITERATOR_TEST_OBJ = $(ITERATOR_TEST_SRC:.cpp=.o)
 BFS_TEST_OBJ = $(BFS_TEST_SRC:.cpp=.o)
+DFS_TEST_OBJ = $(DFS_TEST_SRC:.cpp=.o)
 
 CLASS_TEST_EXE = GraphTester.x
 ITERATOR_TEST_EXE = IteratorTester.x
 BFS_TEST_EXE = BFSTester.x
+DFS_TEST_EXE = DFSTester.x
 
 
 $(CLASS_TEST_EXE): $(OBJ) $(CLASS_TEST_OBJ) $(INCLUDE)
@@ -31,6 +34,9 @@ $(ITERATOR_TEST_EXE): $(OBJ) $(ITERATOR_TEST_OBJ) $(INCLUDE)
 
 $(BFS_TEST_EXE): $(OBJ) $(BFS_TEST_OBJ) $(INCLUDE)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(BFS_TEST_OBJ) -o $(BFS_TEST_EXE)
+
+$(DFS_TEST_EXE): $(OBJ) $(DFS_TEST_OBJ) $(INCLUDE)
+	$(CXX) $(CXXFLAGS) $(OBJ) $(DFS_TEST_OBJ) -o $(DFS_TEST_EXE)
 
 
 #.PHONY: all
@@ -49,6 +55,10 @@ iterator_test: $(ITERATOR_TEST_EXE)
 bfs_test: $(BFS_TEST_EXE)
 	./$(BFS_TEST_EXE)
 
+.PHONY: dfs_test
+dfs_test: $(DFS_TEST_EXE)
+	./$(DFS_TEST_EXE)
+
 
 # RUN TESTS
 .PHONY: test_graphs
@@ -60,7 +70,10 @@ test_iterators: clean_json clean_img iterator_test
 .PHONY: test_bfs
 test_bfs: clean_json clean_img bfs_test
 
-all: $(CLASS_TEST_EXE) $(ITERATOR_TEST_EXE) $(CLASS_TEST_EXE)
+.PHONY: test_dfs
+test_dfs: clean_json clean_img dfs_test
+
+all: $(CLASS_TEST_EXE) $(ITERATOR_TEST_EXE) $(BFS_TEST_EXE) $(DFS_TEST_EXE)
 
 
 # PYTHON

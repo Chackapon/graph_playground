@@ -7,6 +7,12 @@
 
 #include "BaseGraph.hpp"
 
+enum search_mode {
+    PREORDER, POSTORDER
+};
+
+#include <list>
+
 // bfs.hpp
 template <typename T, typename G> // node type, graph type
 requires Graph<G, T>
@@ -20,7 +26,7 @@ public:
     std::unordered_map<T, int> distance; // odległość od źrodła w przeskokach
     std::unordered_map<T, float> price;
 
-    BFS(G& g) : graph(g) {
+    explicit BFS(G& g) : graph(g) {
         for (auto n_it = graph.node_begin();
             n_it != graph.node_end();
             ++n_it) {
@@ -75,13 +81,18 @@ public:
         }
     }
 
-    void display() {
+    void display(const search_mode mode = PREORDER) {
+        std::vector<T> traversal_list;
+        if (mode == PREORDER) traversal_list = this->preorder;
+        else if (mode == POSTORDER) traversal_list = this->postorder;
+        else throw std::invalid_argument("Invalid search mode");
+
         int level = 0;
         std::list<T> candidates;
 
         do {
             candidates.clear();
-            std::copy_if(preorder.begin(), preorder.end(), std::back_inserter(candidates), [level, this]( T node ) {return this->distance[node] == level; });
+            std::copy_if(traversal_list.begin(), traversal_list.end(), std::back_inserter(candidates), [level, this]( T node ) {return this->distance[node] == level; });
             ++level;
             if (!candidates.empty()) std::cout << level << ": " << str(candidates) << std::endl;
         } while ( !candidates.empty() );
