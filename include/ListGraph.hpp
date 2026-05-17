@@ -15,36 +15,18 @@
 #include "GraphIterator.hpp"
 
 
-// graph.hpp
+//region ===================== CLASS =====================
 template <typename T>
 class ListGraph final : public BaseGraph<T> { // wersja5c
     bool directed;
     std::unordered_map<T, std::list<Edge<T> *> > adj_list; // lista sąsiedztwa
     //std::unordered_map<T, std::vector<Edge<T> *> > adj_list; // lista sąsiedztwa
 
-    std::string nodes_to_json() const override {
-        std::string result = "";
-        for (auto root : adj_list) {
-            result += "\"" + std::to_string(root.first) + "\":{";
-            for (const auto &neighbor : root.second) {
-                if (neighbor != nullptr) {
-                    result += "\"" + std::to_string(neighbor->target) + "\":" + std::to_string(neighbor->weight) + ",";
-                }
-            }
-            if (!result.empty() && result.back() == ',') result.pop_back();
-            result += "},";
-        }
-        if (!result.empty() && result.back() == ',') result.pop_back();
-        return result;
-    }
-
 public:
     explicit ListGraph(const bool directed=false) : directed(directed) {}
     ~ListGraph() override { clear(); } // trzeba zwolnić pamięć krawędzi
 
-
-    // ===================== GRAPH =====================
-    std::string graph_implementation() const override { return "ListGraph"; }
+    //region ===================== GRAPH =====================
     bool is_directed() const override { return directed; }
     int v() const override { return adj_list.size(); } // liczba wierzchołków
     int e() const override { // liczba krawędzi
@@ -53,9 +35,9 @@ public:
             counter += pair.second.size();
         return (directed ? counter : counter / 2);
     }
+    //endregion
 
-
-    // ====================== NODE DEGREE =====================
+    //region ====================== NODE DEGREE =====================
     int degree(T u) override {
         // assert( !directed ); // Nie rozumiem tego ograniczenia, wg. definicji, które znalazłem, dla nieskierowanego grafu da się liczyć stopinie wierzchołków
         if (directed) return indegree(u) + outdegree(u);
@@ -71,9 +53,9 @@ public:
         return counter;
     }
     int outdegree(T u) override { return adj_list[u].size(); }
+    //endregion
 
-
-    // ====================== NODES =====================
+    //region ====================== NODES =====================
     void add_node(T u) override {
         if (has_node(u)) throw NodeExistsException();
         adj_list[u];
@@ -83,17 +65,23 @@ public:
         for (auto node : adj_list) {
             try {
                 del_edge(node.first, u);
-            } catch (EdgeDoesntExistException &e) {} // expected behavior to catch attempts to delete edges that don't exist; controlled environment
+            } catch ( [[maybe_unused]] EdgeDoesntExistException &e ) {} // expected behavior to catch attempts to delete edges that don't exist; controlled environment
         }
         // Delete node u
         adj_list.erase(u);
     }
     bool has_node(T u) const override {
-        return adj_list.find(u) != adj_list.end(); // contains() was added in C++20!
+        return adj_list.contains(u);
     }
+    T random_node() override {
+        auto start = node_begin();
+        const int r = rand_int( v() );
+        for (int i = 0; i < r; ++i) { ++start; }
+        return *start;
+    }
+    //endregion
 
-
-    // ====================== EDGES =====================
+    //region ====================== EDGES =====================
     void add_edge(T u, T w, float weight=1.0) override {
         try {
             if (has_edge(u,w)) throw EdgeExistsException();
@@ -146,8 +134,9 @@ public:
 
     }
     float weight(Edge<T> edge) const override { return weight(edge.source, edge.target); }
+    //endregion
 
-
+    //region ===================== MISC =====================
     void clear() override {
         for (auto& pair : adj_list) {
             for (const Edge<T>* edge : pair.second) delete edge;
@@ -155,8 +144,6 @@ public:
         }
         adj_list.clear();
     }
-
-
     void display() const override {
         std::cout << "Displaying graph at " << this << ":" << std::endl;
         for (auto& pair : adj_list) {
@@ -170,62 +157,137 @@ public:
             }
         }
     }
+    //endregion
 
-
-    // ===================== NODE ITERATOR =====================
-    class NodeIterator final {
-        ListGraph* graph;
-        int node_idx;
-    public:
-        explicit NodeIterator(ListGraph* graph, const int idx = 0) : graph(graph), node_idx(idx) {}
-        ~NodeIterator() = default;
-        NodeIterator& operator=(const NodeIterator& other) = default;
-
-        T operator*() const {
-            auto it = graph->adj_list.begin();
-            for (int i = 0; i < node_idx; ++i) ++it;
-            auto val = (*it).first;
-            return val;
+    //region ===================== META =====================
+    std::string graph_implementation() const override { return "ListGraph"; }
+    // TODO redo using nodes() and adjacents()
+    std::string nodes_to_json() const override {
+        std::string result = "";
+        for (auto root : adj_list) {
+            result += "\"" + std::to_string(root.first) + "\":{";
+            for (const auto &neighbor : root.second) {
+                if (neighbor != nullptr) {
+                    result += "\"" + std::to_string(neighbor->target) + "\":" + std::to_string(neighbor->weight) + ",";
+                }
+            }
+            if (!result.empty() && result.back() == ',') result.pop_back();
+            result += "},";
         }
-
-        NodeIterator& operator++() {
-            ++node_idx;
-            return *this;
-        }
-        NodeIterator operator++(int) {
-            NodeIterator temp = *this;
-            ++node_idx;
-            return temp;
-        }
-
-        bool operator==(const NodeIterator& other) const {
-            return graph == other.graph && node_idx == other.node_idx;
-        }
-        bool operator!=(const NodeIterator& other) const {
-            return graph != other.graph || node_idx != other.node_idx;
-        };
-        void increment() { ++node_idx; }
-
-    };
-    NodeIterator node_begin() { return NodeIterator(this, 0); } // lub bez zera
-    NodeIterator node_end() { return NodeIterator(this, v()); }
-    struct Nodes {
-        ListGraph<T>* graph;
-        explicit Nodes(ListGraph<T>* graph): graph(graph) {};
-        NodeIterator begin() const { return graph->node_begin(); }
-        NodeIterator end() const { return graph->node_end(); }
-    };
-    Nodes nodes() { return Nodes(this); }
-    T random_node() override {
-        auto start = node_begin();
-        const int r = rand_int( v() );
-        for (int i = 0; i < r; ++i) { ++start; }
-        return *start;
+        if (!result.empty() && result.back() == ',') result.pop_back();
+        return result;
     }
+    //endregion
 
+    //region ===================== ITERATORS =====================
+        //region ===================== NODES =====================
+            //region ===================== ITERATOR =====================
+            class NodeIterator final {
+                ListGraph* graph;
+                int node_idx;
+            public:
+                explicit NodeIterator(ListGraph* graph, const int idx = 0) : graph(graph), node_idx(idx) {}
+                ~NodeIterator() = default;
+                NodeIterator& operator=(const NodeIterator& other) = default;
 
+                T operator*() const {
+                    auto it = graph->adj_list.begin();
+                    for (int i = 0; i < node_idx; ++i) ++it;
+                    auto val = (*it).first;
+                    return val;
+                }
+
+                NodeIterator& operator++() {
+                    ++node_idx;
+                    return *this;
+                }
+                NodeIterator operator++(int) {
+                    NodeIterator temp = *this;
+                    ++node_idx;
+                    return temp;
+                }
+
+                bool operator==(const NodeIterator& other) const {
+                    return graph == other.graph && node_idx == other.node_idx;
+                }
+                bool operator!=(const NodeIterator& other) const {
+                    return graph != other.graph || node_idx != other.node_idx;
+                };
+                void increment() { ++node_idx; }
+
+            };
+            NodeIterator node_begin() { return NodeIterator(this, 0); } // lub bez zera
+            NodeIterator node_end() { return NodeIterator(this, v()); }
+            //endregion
+            //region ===================== RANGE STRUCT =====================
+            struct Nodes {
+                ListGraph<T>* graph;
+                explicit Nodes(ListGraph<T>* graph): graph(graph) {};
+                NodeIterator begin() const { return graph->node_begin(); }
+                NodeIterator end() const { return graph->node_end(); }
+            };
+            Nodes nodes() { return Nodes(this); }
+            //endregion
+        //endregion
+        //region ===================== ADJACENT NODES =====================
+            //region ===================== ITERATOR =====================
+            class AdjacentIterator final {
+                ListGraph<T>* graph;
+                T source;
+                std::list< Edge<T>* > source_edges;
+                int edge_idx;
+                public:
+                explicit AdjacentIterator(ListGraph<T>* graph, T node, const int idx = 0) : graph(graph), source(node), edge_idx(idx) {
+                    //std::unordered_map<T, std::list<Edge<T> *> > adj_list; // lista sąsiedztwa
+                    auto it = graph->adj_list.find( source );
+                    assert( it != graph->adj_list.end() );
+                    source_edges = it->second;
+                }
+                ~AdjacentIterator() = default;
+                AdjacentIterator(const AdjacentIterator& other) = default;
+                // AdjacentIterator operator=(const NodeIterator& other) = default;
+
+                Edge<T>* operator*() const {
+                    auto it = source_edges.begin();
+                    for (int i = 0; i < edge_idx; ++i) ++it;
+                    return *it;
+                }
+
+                bool operator==(const AdjacentIterator& other) const {
+                    return graph == other.graph && edge_idx == other.edge_idx;
+                }
+                bool operator!=(const AdjacentIterator& other) const {
+                    return graph != other.graph || edge_idx != other.edge_idx;
+                }
+
+                AdjacentIterator& operator++() {
+                    ++edge_idx;
+                    return *this;
+                }
+                AdjacentIterator operator++(int) {
+                    AdjacentIterator temp = *this;
+                    ++edge_idx;
+                    return temp;
+                }
+            };
+            AdjacentIterator adj_begin( int node ) { return AdjacentIterator(this, node); }
+            AdjacentIterator adj_end( int node ) { return AdjacentIterator(this, node, this->adj_list.find(node)->second.size()); } //TODO improve this maybe
+            //endregion
+            //region ===================== RANGE STRUCT =====================
+            struct Adjacents {
+                ListGraph<T>* graph;
+                T source;
+                explicit Adjacents(ListGraph<T>* graph, T node) : graph(graph), source(node) {};
+                AdjacentIterator begin() const { return graph->adj_begin(source); }
+                AdjacentIterator end() const { return graph->adj_end(source); }
+            };
+            Adjacents adjacents( T node ) { return Adjacents(this, node); }
+            //endregion
+        //endregion
+    //endregion
 
 };
+//endregion
 
 
 #endif //ALGOSY2GRAFY_LISTGRAPH_H
