@@ -12,8 +12,6 @@
 #include "HelperFunctions.hpp"
 #include "GraphExceptions.hpp"
 
-#include "GraphIterator.hpp"
-
 
 //region ===================== CLASS =====================
 template <typename T>
