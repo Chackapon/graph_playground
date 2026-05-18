@@ -77,7 +77,7 @@ void generate_random_nodes(ListGraph<int> *graph) {
 
 
 void main_test(ListGraph<int>* graph) {
-    auto r = ReportMaker("raport");
+    auto r = ReportMaker("../report", "dfs_test");
     r.header("DFS for graphs");
 
 
@@ -91,7 +91,7 @@ void main_test(ListGraph<int>* graph) {
     complete_graph(graph);
 
     r.log("Saving graph to json");
-    graph->get_json("json", "DFS_graph.json");
+    graph->get_json("../json", "DFS_graph.json");
 
     r.log("Displaying generated graph");
     r.silent_suberror("dislpay() uses std::cout and cannot be saved to report log");

@@ -178,7 +178,7 @@ int main() {
     // for (const auto graph : graph_collection) testGraph(graph);
     std::vector<int> generated_nodes; // zastanowic sie czy nie da sie tego zrobic lepiej!!!
     const auto list_graph = new MatrixGraph(N);
-    ReportMaker report("trash", "iterator_report");
+    ReportMaker report("../report", "iterator_report");
     try_generate_random_nodes(list_graph, N, &report, &generated_nodes);
 
     // std::sort( generated_nodes.begin(), generated_nodes.end() );
