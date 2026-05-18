@@ -82,9 +82,9 @@ public:
 
     //region ===================== META =====================
     virtual std::string graph_implementation() const = 0;
-    void get_json(const std::string &filename) const {
-        system("mkdir -p json");
-        std::ofstream file(filename);
+    void get_json( const std::string& directory = ".", const std::string &filename = graph_implementation() ) const {
+        system( ("mkdir -p " + directory).c_str() );
+        std::ofstream file(directory + "/" + filename);
         file << R"({"graph": {"implementation": ")" << graph_implementation();
         file <<  R"(", "directed": ")" << (is_directed() ? "True" : "False");
         file << R"(","content": {)";
