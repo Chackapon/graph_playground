@@ -7,6 +7,7 @@
 #include <cassert>
 #include <unordered_map>
 #include <list>
+#include <algorithm>
 
 #include "BaseGraph.hpp"
 #include "HelperFunctions.hpp"

@@ -5,6 +5,11 @@
 #ifndef ALGOSY2GRAFY_BFS_H
 #define ALGOSY2GRAFY_BFS_H
 
+#include <unordered_map>
+#include <vector>
+#include <queue>
+#include <algorithm>
+
 #include "BaseGraph.hpp"
 
 enum search_mode {
