@@ -85,8 +85,8 @@ public:
         try {
             if (has_edge(u,w)) throw EdgeExistsException();
         }
-        catch ( SourceDoesntExistException &e ) {} // Expected exception if target or source doesn't exist
-        catch ( TargetDoesntExistException &e ) {}
+        catch ( [[maybe_unused]] SourceDoesntExistException &e ) {} // Expected exception if target or source doesn't exist
+        catch ( [[maybe_unused]] TargetDoesntExistException &e ) {}
 
         if ( u == w ) throw std::runtime_error("Loops are not allowed in simple graphs"); //TODO improve this design
         if ( !has_node(u) ) add_node(u);
@@ -161,8 +161,8 @@ public:
     //region ===================== META =====================
     std::string graph_implementation() const override { return "ListGraph"; }
     // TODO redo using nodes() and adjacents()
-    std::string nodes_to_json() const override {
-        std::string result = "";
+    std::string nodes_to_json() const override { // FIXME intended to be private
+        std::string result;
         for (auto root : adj_list) {
             result += "\"" + std::to_string(root.first) + "\":{";
             for (const auto &neighbor : root.second) {
@@ -226,6 +226,67 @@ public:
                 NodeIterator end() const { return graph->node_end(); }
             };
             Nodes nodes() { return Nodes(this); }
+            //endregion
+        //endregion
+        //region ===================== EDGES =====================
+            //region ===================== ITERATOR =====================
+            class EdgeIterator final {
+                ListGraph* graph;
+                int node_idx;
+            public:
+                explicit EdgeIterator(ListGraph* graph, const int idx = 0) : graph(graph), node_idx(idx) {}
+                ~EdgeIterator() = default;
+                EdgeIterator& operator=(const EdgeIterator& other) = default;
+
+                Edge<T>* operator*() const { // TODO make better
+                    // TODO eliminate duplicates in undirected graph
+                    auto node_it = graph->adj_list.begin();
+                    while (node_it->second.empty()) ++node_it;
+                    auto edge_it = node_it->second.begin();
+
+                    // std::cout << node_idx << std::endl;
+                    for (int i = 0; i < node_idx; ++i) {
+                        ++edge_it;
+                        if (edge_it == node_it->second.end()) {
+                            ++node_it;
+                            while (node_it->second.empty()) ++node_it;
+                            edge_it = node_it->second.begin();
+                        }
+                    }
+                    auto val = *edge_it;
+                    return val;
+                }
+
+                EdgeIterator& operator++() {
+                    ++node_idx;
+                    return *this;
+                }
+                EdgeIterator operator++(int) {
+                    EdgeIterator temp = *this;
+                    ++node_idx;
+                    return temp;
+                }
+
+                bool operator==(const EdgeIterator& other) const {
+                    return graph == other.graph && node_idx == other.node_idx;
+                }
+                bool operator!=(const EdgeIterator& other) const {
+                    return graph != other.graph || node_idx != other.node_idx;
+                };
+                void increment() { ++node_idx; }
+
+            };
+            EdgeIterator edge_begin() { return EdgeIterator(this, 0); } // lub bez zera
+            EdgeIterator edge_end() { return EdgeIterator(this, e()); }
+            //endregion
+            //region ===================== RANGE STRUCT =====================
+            struct Edges {
+                ListGraph<T>* graph;
+                explicit Edges(ListGraph<T>* graph): graph(graph) {};
+                EdgeIterator begin() const { return graph->edge_begin(); }
+                EdgeIterator end() const { return graph->edge_end(); }
+            };
+            Edges edges() { return Edges(this); }
             //endregion
         //endregion
         //region ===================== ADJACENT NODES =====================

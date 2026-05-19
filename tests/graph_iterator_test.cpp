@@ -1,5 +1,4 @@
 #include <iostream>
-#include <sstream>
 
 #include "../include/MatrixGraph.hpp"
 #include "../include/ListGraph.hpp"
@@ -164,6 +163,29 @@ void try_generate_random_nodes(BaseGraph<int>* graph, const int n, ReportMaker* 
     }
 }
 
+template < HasNodes Graph >
+void generate_connected_graph(Graph* graph, ReportMaker* r = nullptr) {
+    bool flag = true;
+    while ( flag ) {
+        flag = false;
+        for ( const auto source : graph->nodes() ) {
+
+            int size = 0;
+            for ([[maybe_unused]] auto edge : graph->adjacents(source)) ++size;
+            // std::cout << source << ": " << size << std::endl;
+            if ( size == 0 ) {flag = true;}
+            while ( flag ) {
+                try {
+                    graph->add_edge(source, graph->random_node(), rand_float());
+                    break;
+                }
+                catch ( [[maybe_unused]] EdgeExistsException &ee ) {}
+                catch ( [[maybe_unused]] std::runtime_error &ne ) {} // TODO add custom exception for loops!!!
+            }
+        }
+    }
+}
+
 
 int main() {
     rand_init();
@@ -177,15 +199,25 @@ int main() {
     //
     // for (const auto graph : graph_collection) testGraph(graph);
     std::vector<int> generated_nodes; // zastanowic sie czy nie da sie tego zrobic lepiej!!!
-    const auto list_graph = new MatrixGraph(N);
-    ReportMaker report("../report", "iterator_report");
+    const auto list_graph = new ListGraph<int>();
+    ReportMaker report("report", "iterator_report");
     try_generate_random_nodes(list_graph, N, &report, &generated_nodes);
+
 
     // std::sort( generated_nodes.begin(), generated_nodes.end() );
     report.log("Generated random nodes");
     report.sublog( "Read from log vector: " + str(generated_nodes) );
     report.sublog( "Read using iterator: " + str(list_graph->nodes()) ); // TODO fix const char conversion for str() function (currently displays pointer)
 
+    generate_connected_graph(list_graph, &report);
+    report.log("Made the graph complete with randomly generated edges");
+    // for (const auto edge : list_graph->edges()) {
+    //     std::cout << *edge << std::endl;
+    // }
+
+    report.sublog( "Read using iterator: " + str(list_graph->edges()) );
+    list_graph->get_json("json", "iterator_graph.json");
+    // std::cout << Edge(1, 2, 4.5) << std::endl;
 
 
 
