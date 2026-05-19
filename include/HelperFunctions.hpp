@@ -38,7 +38,8 @@ auto str(const Container& cnt) -> decltype( cnt.begin(), cnt.end(), std::string(
 
     for (const auto &e : cnt ) {
         if (!first) result << ", ";
-        result << e;
+        if constexpr (std::is_pointer_v< std::decay_t< decltype(e) > >) result << *e;
+        else result << e; //TODO make an option to display adresses
         first = false;
     }
 
@@ -63,6 +64,10 @@ inline int rand_int(int a , int b = 0) {
     }else{
         return a + rand() % ( b );
     }
+}
+
+inline bool coinflip() {
+    return rand_float() < 0.5; // TODO is it really 50%?
 }
 
 inline float round_float(float x, int precision = 1) {

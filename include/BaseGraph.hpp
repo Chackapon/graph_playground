@@ -13,16 +13,16 @@
 #include "Edge.hpp"
 
 //region ===================== CONCEPTS =====================
-/**
- * Graph concept allows to ensure compatibility with graph iterators.
- * Unfortunately they cannot be included in base class (especially the postfix ++ operator) and this workaround allows them to be used in templates for the BaseGraph.
- * Usage: template <Graph G> ...
- */
 template <typename G>
 concept HasNodes = requires(G graph) { graph.nodes(); };
 template <typename G, typename T>
 concept HasAdjacents = requires(G graph, T node) { graph.adjacents(node); };
 
+/**
+ * Graph concept allows to ensure compatibility with graph iterators.
+ * Unfortunately they cannot be included in base class (especially the postfix ++ operator) and this workaround allows them to be used in templates for the BaseGraph.
+ * Usage: template <Graph G> ...
+ */
 template <typename G, typename T>
 concept Graph = HasNodes<G> && HasAdjacents<G, T>;
 //endregion
