@@ -5,7 +5,7 @@
 #ifndef ALGOSY2GRAFY_REPORTMAKER_HPP
 #define ALGOSY2GRAFY_REPORTMAKER_HPP
 #include <fstream>
-#include <iostream>
+#include <filesystem>
 
 
 class ReportMaker {
@@ -18,7 +18,7 @@ class ReportMaker {
     public:
     explicit ReportMaker(const std::string& directory = ".", const std::string& filename = "report") {
         this->report_id = ++report_counter;
-        system(("mkdir -p "+directory).c_str());
+        if ( !std::filesystem::exists(directory) ) std::filesystem::create_directory( directory );
         this->report_file.open(directory + "/" + filename + "" + std::to_string(this->report_id) + ".log");
     }
     ~ReportMaker() {

@@ -8,7 +8,8 @@
 // TODO apply this formatting for all graphs
 
 // basegraph.hpp
-#include <fstream> // IDEA maybe convert to new C++ filesystem
+#include <fstream>
+#include <filesystem> // IDEA change string args to filepaths
 #include "Edge.hpp"
 
 //region ===================== CONCEPTS =====================
@@ -83,7 +84,7 @@ public:
     //region ===================== META =====================
     virtual std::string graph_implementation() const = 0;
     void get_json( const std::string& directory = ".", const std::string &filename = "graph" ) const {
-        system( ("mkdir -p " + directory).c_str() );
+        if ( !std::filesystem::exists(directory) ) std::filesystem::create_directory( directory );
         std::ofstream file(directory + "/" + filename);
         file << R"({"graph": {"implementation": ")" << graph_implementation();
         file <<  R"(", "directed": ")" << (is_directed() ? "True" : "False");

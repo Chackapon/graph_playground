@@ -2,7 +2,11 @@
 // Created by Mateusz Miliutin on 10/05/2026.
 //
 
+#include <iostream>
+#include <cmath>
+
 #include "../include/ReportMaker.hpp"
+
 
 int ReportMaker::report_counter = 0;
 
