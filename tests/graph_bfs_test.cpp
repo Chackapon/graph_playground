@@ -45,7 +45,7 @@ void fill_edges(Graph* graph, ReportMaker* r = nullptr) {
 
 // TODO improve this function
 template < HasNodes Graph >
-void complete_graph(Graph* graph, ReportMaker* r = nullptr) {
+void generate_connected_graph(Graph* graph, ReportMaker* r = nullptr) {
     bool flag = true;
     while ( flag ) {
         flag = false;
@@ -88,7 +88,7 @@ void main_test(ListGraph<int>* graph) {
     r.log("Generating a random connected graph");
 
     generate_random_nodes(graph);
-    complete_graph(graph);
+    generate_connected_graph(graph);
 
     r.log("Saving graph to json");
     graph->get_json("../json", "BFS_graph.json");
