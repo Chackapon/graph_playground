@@ -5,7 +5,7 @@
 #ifndef ALGOSY2GRAFY_BASEGRAPH_H
 #define ALGOSY2GRAFY_BASEGRAPH_H
 
-// TODO apply this formatting for all graphs
+
 
 // basegraph.hpp
 #include <fstream>

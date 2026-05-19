@@ -12,7 +12,7 @@
 #include "GraphExceptions.hpp"
 
 
-// graph.hpp
+//region ===================== CLASS =====================
 class MatrixGraph final : public BaseGraph<int> { // wersja 7x
     bool directed;
     // Adjacency matrix to store graph edges.
@@ -20,7 +20,7 @@ class MatrixGraph final : public BaseGraph<int> { // wersja 7x
 
     std::string nodes_to_json() const override {
         std::string result;
-        for (int v = 0; v < adj_matrix.size(); ++v) {
+        for (size_t v = 0; v < adj_matrix.size(); ++v) {
             if (has_node(v)) {
                 result += "\"" + std::to_string(v) + "\":{";
 
@@ -46,8 +46,8 @@ public:
     }
     ~MatrixGraph() override { clear(); } // trzeba zwolnić pamięć krawędzi
 
+    //region ===================== GRAPH =====================
     bool is_directed() const override { return directed; }
-
     int v() const override {
         int counter = 0;
         for (const auto& row : adj_matrix) {
@@ -69,7 +69,9 @@ public:
         }
         return edges_counter;
     }
+    //endregion
 
+    //region ===================== NODE DEGREE =====================
     int degree(const int u) override {
         if (directed) return indegree(u) + outdegree(u);
         else return outdegree(u);
@@ -88,12 +90,15 @@ public:
         }
         return counter;
     }
+    //endregion
+
+    //region ===================== NODES =====================
     void add_node(const int u) override {
         if (has_node(u)) throw std::runtime_error("Node already exists");
-        for (int i = 0; i < adj_matrix.at(u).size(); i++) adj_matrix.at(u)[i] = new Edge<int>(u, 0, 0);
+        for (size_t i = 0; i < adj_matrix.at(u).size(); i++) adj_matrix.at(u)[i] = new Edge<int>(u, 0, 0);
     }
     void del_node(const int u) override { // TODO clean up try catches
-        for (int i = 0; i < adj_matrix.size(); i++) {
+        for (size_t i = 0; i < adj_matrix.size(); i++) {
             try {
                 try {
                     std::cout << "trying to delete edge " << u << "->" << i << std::endl;
@@ -107,13 +112,15 @@ public:
 
     }
     bool has_node(const int u) const override {
-        for (int i =0; i < adj_matrix.size(); i++) {
+        for (size_t i =0; i < adj_matrix.size(); i++) {
             if ( adj_matrix.at(u).at(i) != nullptr ) return true;
         }
         return false;
     }
+    // TODO add random_node()
+    //endregion
 
-
+    //region ===================== EDGES =====================
     void add_edge(const int u, const int w, const float weight=1.0) override {
         try {
             if (has_edge(u,w)) throw EdgeExistsException();
@@ -187,7 +194,7 @@ public:
     void display() const override { //TODO unify with how ListGraph displays nodes with no edges
         std::cout << "Displaying graph at " << this << ":" << std::endl;
 
-        for (int i = 0; i < adj_matrix.size(); i++) {
+        for (size_t i = 0; i < adj_matrix.size(); i++) {
             bool empty_flag = true;
             std::cout << "\t * Node \"" << i << "\" has following edges:"<< std::endl;
             for ( const auto &edge : adj_matrix.at(i) ) {
