@@ -41,7 +41,7 @@ void try_generate_random_edges(BaseGraph<int>* graph, ReportMaker* report) {
 }
 
 void testGraph(BaseGraph<int>* graph) {
-    ReportMaker report("../report");
+    ReportMaker report("report", "GraphTest");
     std::ostringstream graph_id;
     graph_id << graph->graph_implementation() << "@" << (void*)graph;
 
@@ -69,7 +69,7 @@ void testGraph(BaseGraph<int>* graph) {
     report.sublog( "Generated graph has " + str(graph->v()) + " nodes and " + str(graph->e()) + " edges" );
 
     report.silent_log("Exporting to json");
-    graph->get_json( "../json", graph_id.str()+"_before_operations.json" );
+    graph->get_json( "json", graph_id.str()+"_before_operations.json" );
     report.line();
 
 
@@ -146,7 +146,7 @@ void testGraph(BaseGraph<int>* graph) {
     report.run_test( "clear()" );
     report.log( "Final graph has " + str(graph->v()) + " nodes and " + str(graph->e()) + " edges" );
     report.silent_log( "Exporting to json" );
-    graph->get_json( "../json", graph_id.str()+".json" );
+    graph->get_json( "json", graph_id.str()+".json" );
     report.log( "Testing clear()" );
     graph->clear();
     report.sublog( "After clear() graph has " + str(graph->v()) + " nodes and " + str(graph->e()) + " edges" );
