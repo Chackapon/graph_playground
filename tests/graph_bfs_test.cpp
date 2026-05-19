@@ -77,7 +77,7 @@ void generate_random_nodes(ListGraph<int> *graph) {
 
 
 void main_test(ListGraph<int>* graph) {
-    auto r = ReportMaker("../report", "bfs_test");
+    auto r = ReportMaker("report", "bfs_test");
     r.header("BFS for graphs");
 
 
