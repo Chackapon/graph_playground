@@ -5,6 +5,7 @@
 #ifndef ALGOSY2GRAFY_EDGE_H
 #define ALGOSY2GRAFY_EDGE_H
 
+#include <format>
 #include <iostream>
 
 // edge.hpp
@@ -21,7 +22,7 @@ public:
     // Operator negacji bitowej, ale tu pasuje.
     Edge operator~() const { return Edge(target, source, weight); }
     Edge& operator=(const Edge& other) = default; // return *this;
-    // friend std::ostream& operator<< <>(std::ostream& os, const Edge<T>& edge);
+    friend std::ostream& operator<<<>(std::ostream& os, const Edge<T>& edge);
     bool operator==(const Edge& edge) {
         return source == edge.source && target == edge.target;
     }
@@ -30,8 +31,11 @@ public:
     }
 };
 
-// template <typename T>
-// std::ostream& operator<<(std::ostream& os, const Edge<T>& edge);
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Edge<T>& edge) {
+    os << std::format("Edge({}->{}:{})", edge.source, edge.target, edge.weight);
+    return os;
+}
 
 
 #endif //ALGOSY2GRAFY_EDGE_H
