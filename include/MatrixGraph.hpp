@@ -18,28 +18,8 @@ class MatrixGraph final : public BaseGraph<int> { // wersja 7x
     // Adjacency matrix to store graph edges.
     std::vector<std::vector<Edge<int> *> > adj_matrix;
 
-    std::string nodes_to_json() const override {
-        std::string result;
-        for (size_t v = 0; v < adj_matrix.size(); ++v) {
-            if (has_node(v)) {
-                result += "\"" + std::to_string(v) + "\":{";
-
-                for (const auto &neighbor : adj_matrix[v]) {
-                    if (neighbor != nullptr  && neighbor->weight != 0) {
-//                        result += R"({"target": ")" + std::to_string(neighbor->target) + R"(", "weight":)" + std::to_string(neighbor->weight) + "},";
-                          result += "\"" + std::to_string(neighbor->target) + "\":" + std::to_string(neighbor->weight) + ",";
-                    }
-                }
-                if (result.back() == ',') result.pop_back();
-
-                result += "},";
-            }
-        }
-        if (result.back() == ',') result.pop_back();
-        return result;
-    }
 public:
-    std::string graph_implementation() const override { return "MatrixGraph"; }
+
     explicit MatrixGraph(const int n, const bool directed=false) : directed(directed) {
         adj_matrix = std::vector< std::vector<Edge<int> *> >(
             n, std::vector<Edge<int> *>(n, nullptr));
@@ -117,7 +97,12 @@ public:
         }
         return false;
     }
-    // TODO add random_node()
+    int random_node() override {
+        auto start = node_begin();
+        const int r = rand_int( v() );
+        for (int i = 0; i < r; ++i) { ++start; }
+        return *start;
+    }
     //endregion
 
     //region ===================== EDGES =====================
@@ -141,11 +126,7 @@ public:
         }
 
     } // dodanie krawędzi (u,w)
-    void add_edge(const Edge<int> edge) override {
-        add_edge(edge.source, edge.target, edge.weight);
-    }
-
-
+    void add_edge(const Edge<int> edge) override { add_edge(edge.source, edge.target, edge.weight); }
 
     void del_edge(const int u, const int w) override {
         if (!has_edge(u,w)) throw EdgeDoesntExistException();
@@ -157,31 +138,23 @@ public:
             adj_matrix.at(w).at(u) = nullptr;
         }
     }
-    void del_edge(const Edge<int> edge) override {
-        del_edge(edge.source, edge.target);
-    }
-
+    void del_edge(const Edge<int> edge) override { del_edge(edge.source, edge.target); }
 
     bool has_edge(const int u, const int w) const override {
         // if (!has_node(u)) throw SourceDoesntExistException(); //TODO z jakiegos powodu to lamie cala logike; naprawic potem jesli bedzie mi sie chcialo
         // if (!has_node(w)) throw TargetDoesntExistException();
         return adj_matrix.at(u).at(w) != nullptr && adj_matrix.at(u).at(w)->weight != 0;
     }
-    bool has_edge(const Edge<int> edge) const override {
-        return has_edge(edge.source, edge.target);
-    }
-
-
+    bool has_edge(const Edge<int> edge) const override { return has_edge(edge.source, edge.target); }
 
     float weight(int u, int w) const override {
         if (!has_edge(u,w)) return 0;
         return adj_matrix.at(u).at(w)->weight;
     } // waga krawędzi lub 0.0
-    float weight(Edge<int> edge) const override {
-        return weight(edge.source, edge.target);
-    }
+    float weight(Edge<int> edge) const override { return weight(edge.source, edge.target); }
+    //endregion
 
-
+    //region ===================== MISC =====================
     void clear() override {
         for (auto &row : adj_matrix) {
             for (auto &edge : row) {
@@ -208,69 +181,96 @@ public:
         }
 
     }
+    //endregion
 
-    // ===================== NODE ITERATOR =====================
-    class NodeIterator final {
-        MatrixGraph* graph;
-        int node_idx;
-    public:
-        explicit NodeIterator(MatrixGraph* graph, const int idx = 0) : graph(graph), node_idx(idx) {}
-        ~NodeIterator() = default;
-        NodeIterator& operator=(const NodeIterator& other) = default;
+    //region ===================== META =====================
+    std::string graph_implementation() const override { return "MatrixGraph"; }
+    std::string nodes_to_json() const override {
+        std::string result;
+        for (size_t v = 0; v < adj_matrix.size(); ++v) {
+            if (has_node(v)) {
+                result += "\"" + std::to_string(v) + "\":{";
 
-        // TODO finish this
-        int operator*() const {
-            int valid_nodes_counter = -1;
-            // std::cout << "Node idx: " << node_idx << std::endl;
-            int node_it = -1;
-            do {
-                // if (node_it == graph->v()) { exit(1); }
-                // ++node_it;
-                // std::cout << "\tNode iterator: " << node_it << std::endl;
-                // std::cout << "\tNode idx: " << node_idx << std::endl;
+                for (const auto &neighbor : adj_matrix[v]) {
+                    if (neighbor != nullptr  && neighbor->weight != 0) {
+                        //                        result += R"({"target": ")" + std::to_string(neighbor->target) + R"(", "weight":)" + std::to_string(neighbor->weight) + "},";
+                        result += "\"" + std::to_string(neighbor->target) + "\":" + std::to_string(neighbor->weight) + ",";
+                    }
+                }
+                if (result.back() == ',') result.pop_back();
 
-                if ( graph->has_node( ++node_it ) ) { ++valid_nodes_counter; }
-                // std::cout << "\tValid: " << valid_nodes_counter << std::endl;
-
-
-            } while (valid_nodes_counter != node_idx);
-            return node_it;
+                result += "},";
+            }
         }
-
-        NodeIterator& operator++() {
-            ++node_idx;
-            return *this;
-        }
-        NodeIterator operator++(int) {
-            NodeIterator temp = *this;
-            ++node_idx;
-            return temp;
-        }
-
-        bool operator==(const NodeIterator& other) const {
-            return graph == other.graph && node_idx == other.node_idx;
-        }
-        bool operator!=(const NodeIterator& other) const {
-            return graph != other.graph || node_idx != other.node_idx;
-        };
-        void increment() { ++node_idx; }
-
-    };
-    NodeIterator node_begin() { return NodeIterator(this, 0); } // lub bez zera
-    NodeIterator node_end() { return NodeIterator(this, v()); }
-    struct Nodes {
-        MatrixGraph* graph;
-        explicit Nodes(MatrixGraph* graph): graph(graph) {};
-        NodeIterator begin() const { return graph->node_begin(); }
-        NodeIterator end() const { return graph->node_end(); }
-    };
-    Nodes nodes() { return Nodes(this); }
-    int random_node() override {
-        auto start = node_begin();
-        const int r = rand_int( v() );
-        for (int i = 0; i < r; ++i) { ++start; }
-        return *start;
+        if (result.back() == ',') result.pop_back(); // TODO unify with ListGraph
+        return result;
     }
+    //endregion
+
+    // ===================== ITERATORS =====================
+        //region ===================== NODES =====================
+            //region ===================== ITERATOR =====================
+            class NodeIterator final {
+                MatrixGraph* graph;
+                int node_idx;
+            public:
+                explicit NodeIterator(MatrixGraph* graph, const int idx = 0) : graph(graph), node_idx(idx) {}
+                ~NodeIterator() = default;
+                NodeIterator& operator=(const NodeIterator& other) = default;
+
+                // TODO finish this
+                int operator*() const {
+                    int valid_nodes_counter = -1;
+                    // std::cout << "Node idx: " << node_idx << std::endl;
+                    int node_it = -1;
+                    do {
+                        // if (node_it == graph->v()) { exit(1); }
+                        // ++node_it;
+                        // std::cout << "\tNode iterator: " << node_it << std::endl;
+                        // std::cout << "\tNode idx: " << node_idx << std::endl;
+
+                        if ( graph->has_node( ++node_it ) ) { ++valid_nodes_counter; }
+                        // std::cout << "\tValid: " << valid_nodes_counter << std::endl;
+
+
+                    } while (valid_nodes_counter != node_idx);
+                    return node_it;
+                }
+
+                NodeIterator& operator++() {
+                    ++node_idx;
+                    return *this;
+                }
+                NodeIterator operator++(int) {
+                    NodeIterator temp = *this;
+                    ++node_idx;
+                    return temp;
+                }
+
+                bool operator==(const NodeIterator& other) const {
+                    return graph == other.graph && node_idx == other.node_idx;
+                }
+                bool operator!=(const NodeIterator& other) const {
+                    return graph != other.graph || node_idx != other.node_idx;
+                };
+                void increment() { ++node_idx; }
+
+            };
+            NodeIterator node_begin() { return NodeIterator(this, 0); } // lub bez zera
+            NodeIterator node_end() { return NodeIterator(this, v()); }
+            //endregion
+            //region ===================== RANGE STRUCT =====================
+            struct Nodes {
+                MatrixGraph* graph;
+                explicit Nodes(MatrixGraph* graph): graph(graph) {};
+                NodeIterator begin() const { return graph->node_begin(); }
+                NodeIterator end() const { return graph->node_end(); }
+            };
+            Nodes nodes() { return Nodes(this); }
+            //endregion
+        //endregion
+    //endregion
+
 };
 
 
