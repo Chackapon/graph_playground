@@ -1,5 +1,5 @@
 //
-// Created by Mateusz Miliutin on 04/05/2026.
+// Created by Mateusz M on 04/05/2026.
 //
 
 #ifndef ALGOSY2GRAFY_EDGE_H

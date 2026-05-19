@@ -1,5 +1,5 @@
 //
-// Created by Mateusz Miliutin on 18/05/2026.
+// Created by Mateusz M on 18/05/2026.
 //
 
 #include "../include/DFS.hpp"

@@ -1,5 +1,5 @@
 //
-// Created by Mateusz Miliutin on 17/05/2026.
+// Created by Mateusz M on 17/05/2026.
 //
 
 #include "../include/ListGraph.hpp"

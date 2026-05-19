@@ -1,24 +1,24 @@
 //
-// Created by Mateusz Miliutin on 18/05/2026.
+// Created by Mateusz M on 18/05/2026.
 //
 
 #ifndef ALGOSY2GRAFY_DFS_HPP
 #define ALGOSY2GRAFY_DFS_HPP
 
-#include "BaseGraph.hpp"
-
 #include <unordered_map>
 #include <vector>
-enum search_mode {
-    PREORDER, POSTORDER
-};
-
 #include <list>
+
+#include "BaseGraph.hpp"
+#include "GraphSearchAlgorithm.hpp"
+
+
+
 
 // dfs.hpp
 template <typename T, typename G> // node type, graph type
 requires Graph<G, T>
-class DFS {
+class DFS : GraphSearchAlgorithm<T, G> {
     G& graph;
     std::unordered_map<T, bool> visited;
 public:
@@ -59,24 +59,24 @@ public:
         }
     }
 
-    void display(const search_mode mode = PREORDER) {
-        std::vector<T> traversal_list;
-        if (mode == PREORDER) traversal_list = this->preorder;
-        else if (mode == POSTORDER) traversal_list = this->postorder;
-        else throw std::invalid_argument("Invalid search mode");
-
-        int level = 0;
-        std::list<T> candidates;
-
-        std::cout << str( traversal_list ) << std::endl;
-
-        // do {
-        //     candidates.clear();
-        //     //std::copy_if(traversal_list.begin(), traversal_list.end(), std::back_inserter(candidates), [level, this]( T node ) {return this->distance[node] == level; });
-        //     ++level;
-        //     if (!candidates.empty()) std::cout << level << ": " << str(candidates) << std::endl;
-        // } while ( !candidates.empty() );
-    }
+    // void display(const search_mode mode = PREORDER) {
+    //     std::vector<T> traversal_list;
+    //     if (mode == PREORDER) traversal_list = this->preorder;
+    //     else if (mode == POSTORDER) traversal_list = this->postorder;
+    //     else throw std::invalid_argument("Invalid search mode");
+    //
+    //     int level = 0;
+    //     std::list<T> candidates;
+    //
+    //     std::cout << str( traversal_list ) << std::endl;
+    //
+    //     // do {
+    //     //     candidates.clear();
+    //     //     //std::copy_if(traversal_list.begin(), traversal_list.end(), std::back_inserter(candidates), [level, this]( T node ) {return this->distance[node] == level; });
+    //     //     ++level;
+    //     //     if (!candidates.empty()) std::cout << level << ": " << str(candidates) << std::endl;
+    //     // } while ( !candidates.empty() );
+    // }
 };
 // Usage:
 // auto algorithm = DFS<int,Graph>(graph); // macierz sąsiedztwa

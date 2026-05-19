@@ -1,5 +1,5 @@
 //
-// Created by Mateusz Miliutin on 08/05/2026.
+// Created by Mateusz M on 08/05/2026.
 //
 
 #ifndef ALGOSY2GRAFY_HELPERFUNCTIONS_H

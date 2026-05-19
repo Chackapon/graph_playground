@@ -1,5 +1,5 @@
 //
-// Created by Mateusz Miliutin on 05/05/2026.
+// Created by Mateusz M on 05/05/2026.
 //
 
 #ifndef ALGOSY2GRAFY_BFS_H
@@ -9,19 +9,18 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
+#include <list>
 
 #include "BaseGraph.hpp"
+#include "GraphSearchAlgorithm.hpp"
 
-enum search_mode {
-    PREORDER, POSTORDER
-};
 
-#include <list>
+
 
 // bfs.hpp
 template <typename T, typename G> // node type, graph type
 requires Graph<G, T>
-class BFS {
+class BFS : GraphSearchAlgorithm<T, G> {
     G& graph;
     std::unordered_map<T, bool> visited;
 public:
