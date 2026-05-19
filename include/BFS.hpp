@@ -20,7 +20,7 @@
 // bfs.hpp
 template <typename T, typename G> // node type, graph type
 requires Graph<G, T>
-class BFS : GraphSearchAlgorithm<T, G> {
+class BFS final : public GraphSearchAlgorithm<T, G> {
     G& graph;
     std::unordered_map<T, bool> visited;
 public:
@@ -30,29 +30,20 @@ public:
     std::unordered_map<T, int> distance; // odległość od źrodła w przeskokach
     std::unordered_map<T, float> price;
 
-    explicit BFS(G& g) : graph(g) {
+    explicit BFS(G& g) : GraphSearchAlgorithm<T, G>(), graph(g) {
         for (auto n_it = graph.node_begin();
-            n_it != graph.node_end();
-            ++n_it) {
+             n_it != graph.node_end();
+             ++n_it) {
             visited[*n_it] = false;
             parent[*n_it] = *n_it; // konwencja, brak rodzica
             distance[*n_it] = -1; // konwencja, -1 oznacza nieskończoność
             price[*n_it] = -1;
-            }
+        }
     }
-    ~BFS() = default; // destruktor
-    void run(T u) { // badamy jedną składową spójną
-        visit(u);
-    }
-    void run() {
-        for (auto n_it = graph.node_begin();
-            n_it != graph.node_end();
-            ++n_it) {
-            if (!visited[*n_it])
-                visit(*n_it);
-            }
-    }
-    void visit(T s) {
+
+    ~BFS() override = default; // destruktor
+
+    void visit(T s, int lvl = 0) override {
         std::queue<T> queue;
         queue.push(s);
 
@@ -85,7 +76,7 @@ public:
         }
     }
 
-    void display(const search_mode mode = PREORDER) {
+    void display(const search_mode mode = PREORDER) override {
         std::vector<T> traversal_list;
         if (mode == PREORDER) traversal_list = this->preorder;
         else if (mode == POSTORDER) traversal_list = this->postorder;
