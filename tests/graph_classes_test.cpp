@@ -5,45 +5,16 @@
 #include "../include/ListGraph.hpp"
 #include "../include/HelperFunctions.hpp"
 #include "../include/ReportMaker.hpp"
+#include "../include/GraphTestUtil.hpp"
 
 constexpr int N = 10;
 
-void try_adding_edge(BaseGraph<int> *graph, const Edge<int>& edge, ReportMaker& r) {
-    try {
-        graph->add_edge( edge );
-    }
-    catch (std::exception& e) {
-        r.silent_suberror("Couldn't add edge " + str(edge.source) + "->" + str(edge.target) + ": " + e.what() );
-    }
-}
 
-void try_generate_random_nodes(BaseGraph<int>* graph, const int n, ReportMaker* report = nullptr, std::vector<int>* generated = nullptr) {
-    for (int i = 0; i < n; ++i) { //add nodes with random values
-        const int node = rand_int(n);
-        try {
-            graph->add_node( node );
-            if (generated != nullptr) generated->push_back( node ); //won't be needed with iterators
-        } catch (const std::exception& e) {
-            if (report != nullptr) report->silent_suberror("Couldn't add node "+str(node)+": "+e.what());
-        }
-
-    }
-}
-
-void try_generate_random_edges(BaseGraph<int>* graph, ReportMaker* report) {
-    const int edges_to_add = rand_int(N) + (N);
-
-    for (int i = 0; i < edges_to_add; ++i) {
-        const int source = graph->random_node();
-        const int target = graph->random_node();
-        try_adding_edge(graph,  Edge<int>(source, target, round_float( rand_float(), 2 )), *report);
-    }
-}
 
 void testGraph(BaseGraph<int>* graph) {
     ReportMaker report("report", "GraphTest");
     std::ostringstream graph_id;
-    graph_id << graph->graph_implementation() << "@" << (void*)graph;
+    graph_id << graph->graph_implementation() << "@" << graph;
 
 
     report.header( "Testing \"" + graph->graph_implementation() + "\" at address " + str((void *)graph) );
@@ -51,20 +22,17 @@ void testGraph(BaseGraph<int>* graph) {
 
 
     report.run_test("add_node(), add_edge() and display()");
-    std::vector<int> generated_nodes; // zastanowic się czy nie da się tego zrobic lepiej!!!
-    // std::cout << "* Testing add_node()" << std::endl;
+    std::vector<int> generated_nodes; // TODO replace with nodes()
     report.log("Testing add_node()");
-    try_generate_random_nodes(graph, N, &report, &generated_nodes);
-
+    try_generate_random_nodes(N, graph, &report, &generated_nodes);
     report.sublog( "Generated nodes: " + str(generated_nodes) + " (plus additionaly 0 and " + str(N-1) + " for testing purposes" );
-    // std::cout << "(this number may not equal to amount of final nodes, ass add_edge() can add the target node if it doesn't exist)" << std::endl;
 
 
 
     report.log( "Testing add_edge()" );
-    try_generate_random_edges(graph, &report);
-    try_adding_edge(graph,  Edge<int>(0, N-1, rand_int(N)), report);
-    try_adding_edge(graph,  Edge<int>(N-1, 0, rand_int(N)), report);
+    try_generate_random_edges( N, graph, &report );
+    try_adding_edge( Edge<int>(0, N-1, rand_int(N)), graph, &report);
+    try_adding_edge( Edge<int>(N-1, 0, rand_int(N)), graph, &report);
 
     report.sublog( "Generated graph has " + str(graph->v()) + " nodes and " + str(graph->e()) + " edges" );
 
@@ -80,7 +48,7 @@ void testGraph(BaseGraph<int>* graph) {
 
     report.run_test("degree(), indegree(), outdegree() and del_node()");
     report.log( "Selecting random node" );
-    int deletion_node = generated_nodes[ rand_int( generated_nodes.size() ) ];
+    int deletion_node = graph->random_node();
     report.log( "Selected node: " + str(deletion_node) );
     report.log( "Degree: " + str(graph->degree( deletion_node )) );
     report.log( "Indegree: " + str(graph->indegree( deletion_node )) );
@@ -102,8 +70,8 @@ void testGraph(BaseGraph<int>* graph) {
         } catch (std::exception& e) {
             report.suberror("Couldn't check if edge " + str(source) + "->" + str(target) + " exists: " + e.what());
         }
-        source = generated_nodes[ rand_int(generated_nodes.size()) ] ;
-        target = generated_nodes[ rand_int(generated_nodes.size()) ] ;
+        source = graph->random_node();
+        target = graph->random_node();
     }
 
     report.log( "Selected nodes: " + str(source) + " and " + str(target) );

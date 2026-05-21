@@ -50,6 +50,9 @@ inline void try_adding_edge(const Edge<int>& edge, BaseGraph<int> *graph, Report
     catch (GraphException& e) {
         if ( report != nullptr ) report->silent_suberror("Couldn't add edge " + str(edge.source) + "->" + str(edge.target) + ": " + e.what() );
     }
+    catch ( [[maybe_unused]] std::runtime_error& re ) { // TODO replace with Loop error
+        if ( report != nullptr ) report->silent_suberror("Couldn't add edge " + str(edge.source) + "->" + str(edge.target) + ": " + re.what() );
+    }
 }
 inline void try_generate_random_edges(const int N, BaseGraph<int>* graph, ReportMaker* report) {
     const int edges_to_add = rand_int(N) + N; // TODO improve this
