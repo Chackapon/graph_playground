@@ -21,8 +21,6 @@
 template <typename T, typename G> // node type, graph type
 requires Graph<G, T>
 class BFS final : public GraphSearchAlgorithm<T, G> {
-    G& graph;
-    std::unordered_map<T, bool> visited;
 public:
     std::vector<T> preorder;
     std::vector<T> postorder;
@@ -30,14 +28,12 @@ public:
     std::unordered_map<T, int> distance; // odległość od źrodła w przeskokach
     std::unordered_map<T, float> price;
 
-    explicit BFS(G& g) : GraphSearchAlgorithm<T, G>(), graph(g) {
-        for (auto n_it = graph.node_begin();
-             n_it != graph.node_end();
-             ++n_it) {
-            visited[*n_it] = false;
-            parent[*n_it] = *n_it; // konwencja, brak rodzica
-            distance[*n_it] = -1; // konwencja, -1 oznacza nieskończoność
-            price[*n_it] = -1;
+    explicit BFS(G& g) : GraphSearchAlgorithm<T, G>(g) {
+        for ( auto n_it : this->graph.nodes() ) {
+            this->visited[n_it] = false;
+            parent[n_it] = n_it; // konwencja, brak rodzica
+            distance[n_it] = -1; // konwencja, -1 oznacza nieskończoność
+            price[n_it] = -1;
         }
     }
 
@@ -47,7 +43,7 @@ public:
         std::queue<T> queue;
         queue.push(s);
 
-        visited[s] = true;
+        this->visited[s] = true;
         parent[s] = s;
         distance[s] = 0;
         price[s] = 0;
@@ -60,11 +56,11 @@ public:
 
             preorder.push_back(node);
 
-            for (auto *edge : graph.adjacents(node)) {
+            for (auto *edge : this->graph.adjacents(node)) {
                 auto [root, neighbour, weight] = *edge;
                 assert(root == node);
-                if (!visited[edge->target]) {
-                    visited[neighbour] = true;
+                if (!this->visited[edge->target]) {
+                    this->visited[neighbour] = true;
                     parent[neighbour] = node;
                     distance[neighbour] = distance[node] + 1;
                     price[neighbour] = price[node] + weight;

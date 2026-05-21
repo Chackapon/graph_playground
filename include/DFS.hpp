@@ -7,7 +7,6 @@
 
 #include <unordered_map>
 #include <vector>
-#include <list>
 
 #include "BaseGraph.hpp"
 #include "GraphSearchAlgorithm.hpp"
@@ -19,30 +18,25 @@
 template <typename T, typename G> // node type, graph type
 requires Graph<G, T>
 class DFS final : public GraphSearchAlgorithm<T, G> {
-    G& graph;
-    std::unordered_map<T, bool> visited;
 public:
     std::vector<T> preorder;
     std::vector<T> postorder;
     std::unordered_map<T, T> parent; // drzewo DFS
-    explicit DFS(G& g) : GraphSearchAlgorithm<T, G>(g), graph(g) {
-        for (auto n_it = graph.node_begin();
-             n_it != graph.node_end();
-             ++n_it) {
-            visited[*n_it] = false;
-            parent[*n_it] = *n_it; // konwencja, brak rodzica
+    explicit DFS(G& g) : GraphSearchAlgorithm<T, G>(g) {
+        for ( auto n_it : this->graph.nodes() ) {
+            this->visited[n_it] = false;
+            parent[n_it] = n_it; // konwencja, brak rodzica
         }
     }
 
     ~DFS() override = default; // destruktor
 
     void visit(T u, const int lvl = 0) override {
-        if ( !visited[u] ) {
-            // std::cout << u << ": " << lvl << std::endl;
-            visited[u] = true;
+        if ( !this->visited[u] ) {
+            this->visited[u] = true;
             preorder.push_back(u);
 
-            for ( auto *edge : graph.adjacents( u ) ) {
+            for ( auto *edge : this->graph.adjacents( u ) ) {
                 auto [root, neighbour, weight] = *edge;
                 visit( neighbour, lvl+1 );
             }
@@ -60,7 +54,7 @@ public:
 
         // do {
         //     candidates.clear();
-        //     //std::copy_if(traversal_list.begin(), traversal_list.end(), std::back_inserter(candidates), [level, this]( T node ) {return this->distance[node] == level; });
+        //     //std::copy_if(traversal_list.begin(), traversal_list.end(), std::back_inserter(candidates), [level, this]( T node ) {return this.distance[node] == level; });
         //     ++level;
         //     if (!candidates.empty()) std::cout << level << ": " << str(candidates) << std::endl;
         // } while ( !candidates.empty() );
