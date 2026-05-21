@@ -105,14 +105,12 @@ void generate_dag(Graph* graph, ReportMaker* r = nullptr) {
     std::vector<int> sorted_nodes;
     std::copy(graph->nodes().begin(), graph->nodes().end(), std::back_inserter(sorted_nodes));
     std::sort(sorted_nodes.begin(), sorted_nodes.end(), [&](int a, int b) { return a < b; }); // NOTE probably optional, check if works without it
-    std::cout << str(sorted_nodes) << std::endl;
 
     for (size_t i = 0; i < sorted_nodes.size(); ++i) {
         for (size_t j = i + 1; j < sorted_nodes.size(); ++j) {
             if (coinflip()) {
                 auto new_edge = Edge<int>(sorted_nodes[i], sorted_nodes[j], rand_float());
                 try_adding_edge(new_edge, graph, r);
-                std::cout << "Added edge" << new_edge << std::endl;
             }
         }
     }
@@ -127,7 +125,7 @@ bool is_topologically_sorted(Graph* graph, std::vector<T> test_nodes) {
         idx[test_nodes[i]] = i;
     }
     for (auto edge : graph->edges() ) {
-        if ( not idx[edge->source] < idx[edge->target] ) return false;
+        if ( idx[edge->source] >= idx[edge->target] ) return false;
     }
     return true;
 }
