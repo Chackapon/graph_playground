@@ -68,7 +68,7 @@ public:
         for (auto node : adj_list) {
             try {
                 del_edge(node.first, u);
-            } catch ( [[maybe_unused]] EdgeDoesntExistException &e ) {} // expected behavior to catch attempts to delete edges that don't exist; controlled environment
+            } catch ( EdgeDoesntExistException& ) {} // expected behavior to catch attempts to delete edges that don't exist; controlled environment
         }
         // Delete node u
         adj_list.erase(u);
@@ -89,8 +89,8 @@ public:
         try {
             if (has_edge(u,w)) throw EdgeExistsException();
         }
-        catch ( [[maybe_unused]] SourceDoesntExistException &e ) {} // Expected exception if target or source doesn't exist
-        catch ( [[maybe_unused]] TargetDoesntExistException &e ) {}
+        catch ( SourceDoesntExistException& ) {} // Expected exception if target or source doesn't exist
+        catch ( TargetDoesntExistException& ) {}
 
         if ( u == w ) throw std::runtime_error("Loops are not allowed in simple graphs"); //TODO improve this design
         if ( !has_node(u) ) add_node(u);
@@ -352,22 +352,22 @@ public:
 
     //region ===================== OPERATORS =====================
             ListGraph operator+(ListGraph& other) {
-                auto temp = ListGraph<T>(other.is_directed());
+                auto temp = ListGraph(other.is_directed());
                 for ( auto node_this : this->nodes() ) temp.add_node( node_this );
                 for ( auto node_other : other.nodes() ) {
                     try { temp.add_node( node_other ); }
-                    catch ( [[maybe_unused]] NodeExistsException& e ) {}
+                    catch ( NodeExistsException& ) {}
                 }
 
                 std::cout << "edges from this" << std::endl;
                 for ( auto edge_this : this->edges() ) {
                     try { temp.add_edge( *edge_this ); }
-                    catch ( [[maybe_unused]] EdgeException& e ) {}
+                    catch ( EdgeException& ) {}
                 }
                 std::cout << "edges from other" << std::endl;
                 for ( auto edge_other : other.edges() ) {
                     try { temp.add_edge( *edge_other ); }
-                    catch ( [[maybe_unused]] EdgeException& e ) {}
+                    catch ( EdgeException& ) {}
                 }
                 return temp;
             }
