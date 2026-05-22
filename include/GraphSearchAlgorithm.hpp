@@ -29,7 +29,10 @@ class GraphSearchAlgorithm {
     std::vector<T> postorder;
     std::unordered_map<T, T> parent; // drzewo DFS
 
-    virtual void run(T u) { visit(u); }
+    virtual void run(T u) {
+        preorder.clear(); postorder.clear();
+        visit(u);
+    }
     virtual void run() {
         for ( auto n_it : graph.nodes() ) {
             if (!visited[n_it])
