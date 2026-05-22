@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <list>
 #include <algorithm>
+#include <set>
 
 #include "BaseGraph.hpp"
 #include "HelperFunctions.hpp"
@@ -23,6 +24,9 @@ class ListGraph final : public BaseGraph<T> { // wersja5c
 
 public:
     explicit ListGraph(const bool directed=false) : directed(directed) {}
+    explicit ListGraph(std::set<T> nodes, const bool directed=false) : directed(directed) {
+        for (auto node : nodes) this->add_node(node);
+    }
     ~ListGraph() override { clear(); } // trzeba zwolnić pamięć krawędzi
 
     //region ===================== GRAPH =====================
@@ -346,6 +350,32 @@ public:
         //endregion
     //endregion
 
+    //region ===================== OPERATORS =====================
+            ListGraph operator+(ListGraph& other) {
+                auto temp = ListGraph<T>(other.is_directed());
+                for ( auto node_this : this->nodes() ) temp.add_node( node_this );
+                for ( auto node_other : other.nodes() ) {
+                    try { temp.add_node( node_other ); }
+                    catch ( [[maybe_unused]] NodeExistsException& e ) {}
+                }
+
+                std::cout << "edges from this" << std::endl;
+                for ( auto edge_this : this->edges() ) {
+                    try { temp.add_edge( *edge_this ); }
+                    catch ( [[maybe_unused]] GraphException& e ) {} // TODO create EdgeException base class and use it here
+                }
+                std::cout << "edges from other" << std::endl;
+                for ( auto edge_other : other.edges() ) {
+                    try { temp.add_edge( *edge_other ); }
+                    catch ( [[maybe_unused]] GraphException& e ) {} // TODO create EdgeException base class and use it here
+                }
+                return temp;
+            }
+            // ListGraph &operator+=(const ListGraph& other) {
+            //     return this+other;
+            // }
+
+    //endregion
 };
 //endregion
 
