@@ -79,16 +79,18 @@ void fill_edges(Graph* graph, ReportMaker* r = nullptr) {
     }
 }
 template < HasNodes Graph >
-void generate_connected_graph(Graph* graph, ReportMaker* r = nullptr) {
+void generate_connected_graph(Graph* graph, [[maybe_unused]] ReportMaker* r = nullptr) {
     bool flag = true;
     while ( flag ) {
         flag = false;
         for ( const auto source : graph->nodes() ) {
-
+            // std::cout << source << std::endl;
             int size = 0;
             for ([[maybe_unused]] auto edge : graph->adjacents(source)) ++size;
             // std::cout << source << ": " << size << std::endl;
             if ( size == 0 ) {flag = true;}
+            else break;
+
             while ( flag ) {
                 try {
                     graph->add_edge(source, graph->random_node(), rand_float());
@@ -97,6 +99,9 @@ void generate_connected_graph(Graph* graph, ReportMaker* r = nullptr) {
                 catch ( [[maybe_unused]] EdgeExistsException &ee ) {}
                 catch ( [[maybe_unused]] std::runtime_error &ne ) {} // TODO add custom exception for loops!!!
             }
+            // size = 0;
+            // for ([[maybe_unused]] auto edge : graph->adjacents(source)) ++size;
+            // std::cout << source << ": " << size << std::endl;
         }
     }
 }
