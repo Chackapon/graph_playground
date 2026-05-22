@@ -362,12 +362,12 @@ public:
                 std::cout << "edges from this" << std::endl;
                 for ( auto edge_this : this->edges() ) {
                     try { temp.add_edge( *edge_this ); }
-                    catch ( [[maybe_unused]] GraphException& e ) {} // TODO create EdgeException base class and use it here
+                    catch ( [[maybe_unused]] EdgeException& e ) {}
                 }
                 std::cout << "edges from other" << std::endl;
                 for ( auto edge_other : other.edges() ) {
                     try { temp.add_edge( *edge_other ); }
-                    catch ( [[maybe_unused]] GraphException& e ) {} // TODO create EdgeException base class and use it here
+                    catch ( [[maybe_unused]] EdgeException& e ) {}
                 }
                 return temp;
             }
