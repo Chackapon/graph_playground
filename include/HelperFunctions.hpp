@@ -52,6 +52,9 @@ inline void rand_init() {
     std::random_device rd;
     srand( rd() ); //TODO update to new C++ random standard
 }
+inline void rand_init(const int seed) {
+    srand( seed ); //TODO update to new C++ random standard
+}
 
 inline float rand_float() {
     const float r = (float)(rand()) / (float)(RAND_MAX);
