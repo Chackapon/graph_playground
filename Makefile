@@ -9,13 +9,14 @@ EXE_DIR = exe
 
 SRC = $(wildcard lib/*.cpp)
 TESTS_SRC = $(wildcard tests/*.cpp)
-TESTS = CLASS ITERATOR BFS DFS TAJRAN
+TESTS = CLASS ITERATOR BFS DFS TAJRAN CONNECTION
 
 CLASS_TEST_SRC = tests/graph_classes_test.cpp
 ITERATOR_TEST_SRC = tests/graph_iterator_test.cpp
 BFS_TEST_SRC = tests/graph_bfs_test.cpp
 DFS_TEST_SRC = tests/graph_dfs_test.cpp
 TAJRAN_TEST_SRC = tests/graph_tajran_test.cpp
+CONNECTION_TEST_SRC = tests/graph_connected_test.cpp
 
 INCLUDE = $( wildcard include/*.hpp )
 
@@ -36,6 +37,7 @@ ITERATOR_TEST_EXE = $(EXE_DIR)/IteratorTester.x
 BFS_TEST_EXE = $(EXE_DIR)/BFSTester.x
 DFS_TEST_EXE = $(EXE_DIR)/DFSTester.x
 TAJRAN_TEST_EXE = $(EXE_DIR)/TajranTester.x
+CONNECTION_TEST_EXE = $(EXE_DIR)/GraphConnectionTester.x
 # Generate executable rules for every test
 $(foreach test,$(TESTS), \
   $(eval $($(test)_TEST_EXE): $(OBJ) $($(test)_TEST_OBJ) $(INCLUDE) ; \
@@ -75,6 +77,10 @@ run_dfs_test: $(DFS_TEST_EXE)
 .PHONY: run_tajran_test
 run_tajran_test: $(TAJRAN_TEST_EXE)
 	./$(TAJRAN_TEST_EXE)
+
+.PHONY: run_connection_test
+run_connection_test: $(CONNECTION_TEST_EXE)
+	./$(CONNECTION_TEST_EXE)
 
 
 ZADANIE3i4_CONTENT := BaseGraph ListGraph MatrixGraph ReportMaker HelperFunctions GraphExceptions Edge
