@@ -15,6 +15,8 @@ constexpr int N = 10;
 
 
 int main () {
+    rand_init();
+
     const auto graph = new ListGraph<int>(true);
     const auto r = new ReportMaker("report", "topological_sorting"); // TODO either report should need extension in name or json doesnt
     r->header("Topological sorting using DFS");

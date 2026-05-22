@@ -149,7 +149,7 @@ void testGraph(BaseGraph<int>* graph) {
 
 }
 */
-
+// TODO replace with GraphTestUtil
 void try_generate_random_nodes(BaseGraph<int>* graph, const int n, ReportMaker* report = nullptr, std::vector<int>* generated = nullptr) {
     for (int i = 0; i < n; ++i) { //add nodes with random values
         const int node = rand_int(n);
@@ -162,7 +162,7 @@ void try_generate_random_nodes(BaseGraph<int>* graph, const int n, ReportMaker* 
 
     }
 }
-
+// TODO replace with GraphTestUtil
 template < HasNodes Graph >
 void generate_connected_graph(Graph* graph, ReportMaker* r = nullptr) {
     bool flag = true;
