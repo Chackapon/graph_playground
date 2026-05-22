@@ -10,6 +10,7 @@
 
 #include "BaseGraph.hpp"
 #include "GraphSearchAlgorithm.hpp"
+#include "HelperFunctions.hpp"
 
 
 
@@ -19,8 +20,6 @@ template <typename T, typename G> // node type, graph type
 requires Graph<G, T>
 class DFS final : public GraphSearchAlgorithm<T, G> {
 public:
-    std::vector<T> preorder;
-    std::vector<T> postorder;
     std::unordered_map<T, T> parent; // drzewo DFS
     explicit DFS(G& g) : GraphSearchAlgorithm<T, G>(g) {
         for ( auto n_it : this->graph.nodes() ) {
@@ -34,13 +33,13 @@ public:
     void visit(T u, const int lvl = 0) override {
         if ( !this->visited[u] ) {
             this->visited[u] = true;
-            preorder.push_back(u);
+            this->preorder.push_back(u);
 
             for ( auto *edge : this->graph.adjacents( u ) ) {
                 auto [root, neighbour, weight] = *edge;
                 visit( neighbour, lvl+1 );
             }
-            postorder.push_back(u);
+            this->postorder.push_back(u);
         }
     }
 
@@ -49,15 +48,7 @@ public:
         if (mode == PREORDER) traversal_list = this->preorder;
         else if (mode == POSTORDER) traversal_list = this->postorder;
         else throw std::invalid_argument("Invalid search mode");
-
         std::cout << str( traversal_list ) << std::endl;
-
-        // do {
-        //     candidates.clear();
-        //     //std::copy_if(traversal_list.begin(), traversal_list.end(), std::back_inserter(candidates), [level, this]( T node ) {return this.distance[node] == level; });
-        //     ++level;
-        //     if (!candidates.empty()) std::cout << level << ": " << str(candidates) << std::endl;
-        // } while ( !candidates.empty() );
     }
 };
 // Usage:

@@ -13,6 +13,7 @@
 
 #include "BaseGraph.hpp"
 #include "GraphSearchAlgorithm.hpp"
+#include "HelperFunctions.hpp"
 
 
 
@@ -22,8 +23,6 @@ template <typename T, typename G> // node type, graph type
 requires Graph<G, T>
 class BFS final : public GraphSearchAlgorithm<T, G> {
 public:
-    std::vector<T> preorder;
-    std::vector<T> postorder;
     std::unordered_map<T, T> parent;     // drzewo BFS
     std::unordered_map<T, int> distance; // odległość od źrodła w przeskokach
     std::unordered_map<T, float> price;
@@ -54,7 +53,7 @@ public:
 
             // std::cout << node << " visited? " + yn(visited[node]) << std::endl;
 
-            preorder.push_back(node);
+            this->preorder.push_back(node);
 
             for (auto *edge : this->graph.adjacents(node)) {
                 auto [root, neighbour, weight] = *edge;
@@ -68,7 +67,7 @@ public:
                     queue.push(neighbour);
                 }
             }
-            postorder.push_back(node);
+            this->postorder.push_back(node);
         }
     }
 
