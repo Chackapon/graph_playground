@@ -12,6 +12,7 @@
 #include "BFS.hpp"
 
 
+
 template <typename T, typename G> // node type, graph type
 requires Graph<G, T>
 class ConnectedComponents {
@@ -31,29 +32,14 @@ public:
         auto bfs_root = std::find_if( component.begin(), component.end(), [](const auto& n) { return n.second == -1; } );
         BFS<T, G> bfs(graph);
 
-        // std::cout << "all nodes: " << str(graph.nodes()) << std::endl;
-
         while ( bfs_root != component.end() ) {
-            // std::cout << "ncc=" << ncc << std::endl;
-            // std::cout << "current root: " << bfs_root->first << std::endl;
             bfs.run( bfs_root->first );
-            // std::cout << str(bfs.preorder) << std::endl;
             for (auto node : bfs.preorder) component[node] = ncc;
             ++ncc;
 
             bfs_root = std::find_if( component.begin(), component.end(), [](const auto& n) { return n.second == -1; } );
         }
-
-        // --ncc;
     }
 };
-// Usage:
-// auto algorithm = ConnectedComponents<int,Graph>(G); // macierz sąsiedztwa
-// auto algorithm = ConnectedComponents<char,Graph<char>>(G); // lista sąsiedztwa
-// algorithm.run();
-// for (auto& pair : algorithm.component)
-//     std::cout << pair.first << " component : " << pair.second << std::endl;
-// std::cout << "total components " << algorithm.ncc << std::endl;
-
 
 #endif //ALGOSY2GRAFY_CONNECTEDCOMPONENTS_HPP

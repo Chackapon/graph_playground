@@ -54,7 +54,7 @@ int main() {
             try { graph.add_node(node); } catch( NodeExistsException& ) {} // TODO change all unused exceptions to this
         }
         for (const auto edge : temp_graph->edges()) {
-            try { graph.add_edge(*edge); } catch( GraphException& ) {} // TODO change all unused exceptions to this
+            try { graph.add_edge(*edge); } catch( GraphException& ) {}
         }
     }
     r->log("Flattened temporary graph chunks into one that has "+str(graph.v())+" nodes and "+str(graph.e())+" edges");

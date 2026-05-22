@@ -9,13 +9,13 @@ EXE_DIR = exe
 
 SRC = $(wildcard lib/*.cpp)
 TESTS_SRC = $(wildcard tests/*.cpp)
-TESTS = CLASS ITERATOR BFS DFS TAJRAN CONNECTION
+TESTS = CLASS ITERATOR BFS DFS TARJAN CONNECTION
 
 CLASS_TEST_SRC = tests/graph_classes_test.cpp
 ITERATOR_TEST_SRC = tests/graph_iterator_test.cpp
 BFS_TEST_SRC = tests/graph_bfs_test.cpp
 DFS_TEST_SRC = tests/graph_dfs_test.cpp
-TAJRAN_TEST_SRC = tests/graph_tajran_test.cpp
+TARJAN_TEST_SRC = tests/graph_tarjan_test.cpp
 CONNECTION_TEST_SRC = tests/graph_connected_test.cpp
 
 INCLUDE = $( wildcard include/*.hpp )
@@ -36,7 +36,7 @@ CLASS_TEST_EXE = $(EXE_DIR)/GraphTester.x
 ITERATOR_TEST_EXE = $(EXE_DIR)/IteratorTester.x
 BFS_TEST_EXE = $(EXE_DIR)/BFSTester.x
 DFS_TEST_EXE = $(EXE_DIR)/DFSTester.x
-TAJRAN_TEST_EXE = $(EXE_DIR)/TajranTester.x
+TARJAN_TEST_EXE = $(EXE_DIR)/TarjanTester.x
 CONNECTION_TEST_EXE = $(EXE_DIR)/GraphConnectionTester.x
 # Generate executable rules for every test
 $(foreach test,$(TESTS), \
@@ -74,9 +74,9 @@ run_bfs_test: $(BFS_TEST_EXE)
 run_dfs_test: $(DFS_TEST_EXE)
 	./$(DFS_TEST_EXE)
 
-.PHONY: run_tajran_test
-run_tajran_test: $(TAJRAN_TEST_EXE)
-	./$(TAJRAN_TEST_EXE)
+.PHONY: run_tarjan_test
+run_tarjan_test: $(TARJAN_TEST_EXE)
+	./$(TARJAN_TEST_EXE)
 
 .PHONY: run_connection_test
 run_connection_test: $(CONNECTION_TEST_EXE)
@@ -120,6 +120,12 @@ test_bfs: clean_json clean_img run_bfs_test
 
 .PHONY: test_dfs
 test_dfs: clean_json clean_img run_dfs_test
+
+.PHONY: test_tarjan
+test_tarjan: clean_json clean_img run_tarjan_test
+
+.PHONY: test_connection
+test_connection: clean_json clean_img run_connection_test
 
 #all: $(CLASS_TEST_EXE) $(ITERATOR_TEST_EXE) $(BFS_TEST_EXE) $(DFS_TEST_EXE)
 all: $(foreach test,$(TESTS),$($(test)_TEST_EXE))
