@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+import subprocess
+
 import json
+import yaml
 import os
 
 nx_layouts = {
@@ -114,8 +117,8 @@ class GraphVisualiser:
 
         plt.title("Implementation: " + self.implementation, fontsize=20)
         plt.figtext(0.5, 0.07, "Directed: " + str(self.directed), ha="center")
-        os.system("mkdir -p img")
-        plt.savefig("img/" + self.filename + ".png")
+        subprocess.run( ["mkdir", "-p", getConfigData()["IMAGE_DIRECTORY"]] )
+        plt.savefig( getConfigData()["IMAGE_DIRECTORY"] + '/' + self.filename + ".png" )
         plt.close()
 
     def loadGraph(self, filename):
@@ -139,13 +142,20 @@ class GraphVisualiser:
             print("Graph File Not Found")
 
 
+def getConfigFile():
+    with open("Makefile", "r") as makefile:
+        return makefile.readline().split()[-1] # TODO make dynamic
 
+def getConfigData():
+    from yaml import SafeLoader, load
+    with open(getConfigFile(), "r") as cfg:
+        return load(cfg, Loader=SafeLoader)
 
 if __name__ == '__main__':
+    config_file = getConfigData()
 
-
-    for graph_file in os.listdir('json'):
-        if graph_file.endswith(".json"):
-            g = GraphVisualiser("json/" + graph_file)
+    for graph_file in os.listdir( config_file["JSON_DIRECTORY"] ):
+        if graph_file.endswith( '.' + config_file["JSON_DIRECTORY"] ):
+            g = GraphVisualiser( config_file["JSON_DIRECTORY"] + '/' + graph_file )
             g.visualise()
 
