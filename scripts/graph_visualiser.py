@@ -3,7 +3,7 @@ import networkx as nx
 import subprocess
 
 import json
-import yaml
+from get_config_name import getConfigFile
 import os
 
 nx_layouts = {
@@ -142,9 +142,6 @@ class GraphVisualiser:
             print("Graph File Not Found")
 
 
-def getConfigFile():
-    with open("Makefile", "r") as makefile:
-        return makefile.readline().split()[-1] # TODO make dynamic
 
 def getConfigData():
     from yaml import SafeLoader, load

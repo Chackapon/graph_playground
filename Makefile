@@ -1,14 +1,14 @@
-CONFIG_FILE = config.yaml
 .SUFFIXES: .cpp .x .o .json
-
+CONFIG_FILE = config.yaml
 
 
 # COMPILER
 KERNEL_NAME := $(shell uname -s)
 ifeq ($(KERNEL_NAME),Darwin)
-    CXX := g++-15
+    CXX = g++-15
+    VENV = .venv/bin/ # WARNING THIS IS ONLY TO MAKE TESTS FOR ME EASIER
 else
-    CXX := g++
+    CXX = g++
 endif
 CXXFLAGS = -std=c++20 -pedantic -Wall -Wextra
 LD = $(CXX)
@@ -23,17 +23,18 @@ graph_$(1)_test.x
 endef
 
 
-
+# PYTHON SCRIPTS DIRECTORY (HARDCODED)
+SCRIPT_DIR = scripts
 # CODE DIRECTORIES
-LIB_DIR = $(shell python3 config_parser.py SOURCE_DIRECTORY)
-TESTS_DIR = $(shell python3 config_parser.py TESTS_DIRECTORY)
-OBJ_DIR = $(shell python3 config_parser.py OBJECT_DIRECTORY)
-EXE_DIR = $(shell python3 config_parser.py EXECUTABLES_DIRECTORY)
+LIB_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py SOURCE_DIRECTORY)
+TESTS_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py TESTS_DIRECTORY)
+OBJ_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py OBJECT_DIRECTORY)
+EXE_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py EXECUTABLES_DIRECTORY)
 
 # EXPORT DIRECTORIES
-JSON_DIR = $(shell python3 config_parser.py JSON_DIRECTORY)
-IMG_DIR = $(shell python3 config_parser.py IMAGE_DIRECTORY)
-REPORT_DIR = $(shell python3 config_parser.py REPORT_DIRECTORY)
+JSON_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py JSON_DIRECTORY)
+IMG_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py IMAGE_DIRECTORY)
+REPORT_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py REPORT_DIRECTORY)
 
 
 # IDEA replace with specific instructions for the libraries
@@ -96,26 +97,24 @@ $(foreach test,$(TESTS),$(eval \
 
 
 # Generate all rule
+.PHONY: all
 all: $(foreach test,$(TESTS),$($(test)_test_exe))
 
+.PHONY: clean_export
 clean_export:
 	rm -f $(IMG_DIR)/*
 	rm -f $(REPORT_DIR)/*
 	rm -f $(JSON_DIR)/*
 
+.PHONY: clean
 clean:
 	rm -f $(OBJ_DIR)/*.o
 	rm -f $(LIB_DIR)/*.o # TODO move lib obj files to obj folder
 
+.PHONY: visualise
 visualise:
-	.venv/bin/python3 graph_visualiser.py
-	#python3 graph_visualiser.py
+	$(VENV)python3 $(SCRIPT_DIR)/graph_visualiser.py
 
+.PHONY: test
 test:
 	$(info ./$(EXE_DIR)/bfs_test_exe)
-#.PHONY: build_config_parser
-#build_config_parser:
-#	.venv/bin/python3 -m nuitka --onefile --standalone --lto=yes --follow-imports config_parser.py
-#	.venv/bin/python3 pyinstaller --onefile --hidden_import=yaml config_parser.py
-#	rm -f build
-#	rm -f config_parser.spec
