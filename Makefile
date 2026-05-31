@@ -97,10 +97,9 @@ $(foreach test,$(TESTS),$(eval \
 # Generate make run command for all test executables
 define generate_run_target
 .PHONY: test_$(1)
-test_$(1): $($(1)_test_exe)
+test_$(1): $($(1)_test_exe) clnex
 	./$(EXE_DIR)/$($(1)_test_exe)
 endef
-
 $(foreach test,$(TESTS),$(eval $(call generate_run_target,$(test))))
 
 
