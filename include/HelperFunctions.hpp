@@ -80,6 +80,13 @@ inline float round_float(float x, int precision = 1) {
 
 
 
+-template <typename KeyType>
+class MapValueComparator {
+public:
+    bool operator()(std::pair<KeyType, float> p1, std::pair<KeyType, float> p2) {
+        return p1.second > p2.second;
+    }
+};
 
 
 
