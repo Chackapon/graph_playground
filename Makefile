@@ -1,3 +1,10 @@
+#@ ----------------------------------------------------------------------
+#@ This is my university project, where I implement elements of graph
+#@ theory with C++. You are now reading the help menu of my automated
+#@ Makefile, which automatically generates a build target for every .cpp
+#@ test file in the tests directory.
+#@ ----------------------------------------------------------------------
+
 .SUFFIXES: .cpp .x .o .json
 CONFIG_FILE = config.yaml
 
@@ -26,15 +33,15 @@ endef
 # PYTHON SCRIPTS DIRECTORY (HARDCODED)
 SCRIPT_DIR = scripts
 # CODE DIRECTORIES
-LIB_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py SOURCE_DIRECTORY)
-TESTS_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py TESTS_DIRECTORY)
-OBJ_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py OBJECT_DIRECTORY)
-EXE_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py EXECUTABLES_DIRECTORY)
+LIB_DIR := $(shell python3 $(SCRIPT_DIR)/config_parser.py SOURCE_DIRECTORY)
+TESTS_DIR := $(shell python3 $(SCRIPT_DIR)/config_parser.py TESTS_DIRECTORY)
+OBJ_DIR := $(shell python3 $(SCRIPT_DIR)/config_parser.py OBJECT_DIRECTORY)
+EXE_DIR := $(shell python3 $(SCRIPT_DIR)/config_parser.py EXECUTABLES_DIRECTORY)
 
 # EXPORT DIRECTORIES
-JSON_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py JSON_DIRECTORY)
-IMG_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py IMAGE_DIRECTORY)
-REPORT_DIR = $(shell python3 $(SCRIPT_DIR)/config_parser.py REPORT_DIRECTORY)
+JSON_DIR := $(shell python3 $(SCRIPT_DIR)/config_parser.py JSON_DIRECTORY)
+IMG_DIR := $(shell python3 $(SCRIPT_DIR)/config_parser.py IMAGE_DIRECTORY)
+REPORT_DIR := $(shell python3 $(SCRIPT_DIR)/config_parser.py REPORT_DIRECTORY)
 
 
 # IDEA replace with specific instructions for the libraries
@@ -88,33 +95,49 @@ $(foreach test,$(TESTS),$(eval \
 ))
 
 # Generate make run command for all test executables
-.PHONY: $(foreach test,$(TESTS),run_$(test)_test)
-$(foreach test,$(TESTS),$(eval \
-	run_$(test)_test : $($(test)_test_exe) ; \
-		./$(EXE_DIR)/$($(test)_test_exe) \
-))
+define generate_run_target
+.PHONY: test_$(1)
+test_$(1): $($(1)_test_exe)
+	./$(EXE_DIR)/$($(1)_test_exe)
+endef
+
+$(foreach test,$(TESTS),$(eval $(call generate_run_target,$(test))))
 
 
 
 # Generate all rule
 .PHONY: all
+all: ## 	 Generates executables for all tests
 all: $(foreach test,$(TESTS),$($(test)_test_exe))
 
-.PHONY: clean_export
-clean_export:
+.PHONY: clnex # FIXME previous target name was much better but double tabulator didn't handle it well
+clnex: ## Removes all json, png and report files
 	rm -f $(IMG_DIR)/*
 	rm -f $(REPORT_DIR)/*
 	rm -f $(JSON_DIR)/*
 
 .PHONY: clean
-clean:
+clean: ## Deletes all generated object files
 	rm -f $(OBJ_DIR)/*.o
 	rm -f $(LIB_DIR)/*.o # TODO move lib obj files to obj folder
 
-.PHONY: visualise
-visualise:
+.PHONY: pyvis # FIXME previous target name was much better but double tabulator didn't handle it well
+pyvis: ## Run a Python graph visualiser script
 	$(VENV)python3 $(SCRIPT_DIR)/graph_visualiser.py
+
+.PHONY: help # TODO improve this
+help: ## Show this help.
+	@sed -ne '/@sed/!s/#@ //p' $(MAKEFILE_LIST)
+	@echo \> Available test targets: # TODO make actual descriptions for tests
+	@$(foreach t,$(TESTS), printf "\t* %s\n" "$(t)";)
+	@echo \(?\) To run them use \"make test_\<test_name\>\" \(for example make test_dfs\)
+	@echo
+	@echo \> Utility targets:
+	@sed -ne '/@sed/!{/##/{s/##/\t/; s/^/\t* /; p;};}' $(MAKEFILE_LIST) # TODO replace with something where i can control formatting better
+	@echo ----------------------------------------------------------------------
+
 
 .PHONY: test
 test:
-	$(info ./$(EXE_DIR)/bfs_test_exe)
+	$(shell sed $(MAKEFILE_LIST))
+	$(shell sed $(MAKEFILE_LIST))
