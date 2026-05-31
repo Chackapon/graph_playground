@@ -4,154 +4,74 @@ CXX = g++-15
 #CXX = g++
 CXXFLAGS = -std=c++20 -pedantic -Wall -Wextra
 #LD = $(CXX)
-#LFLAGS = -Wall -std=c++11 -pedantic -O
+#LFLAGS = -std=c++20 -pedantic -Wall -Wextra
 EXE_DIR = exe
 
-SRC = $(wildcard lib/*.cpp)
-TESTS_SRC = $(wildcard tests/*.cpp)
-TESTS = CLASS ITERATOR BFS DFS TARJAN CONNECTION
+LIB_SRC = $(wildcard lib/*.cpp)
+LIB_OBJ = $(LIB_SRC:.cpp=.o)
 
-CLASS_TEST_SRC = tests/graph_classes_test.cpp
-ITERATOR_TEST_SRC = tests/graph_iterator_test.cpp
-BFS_TEST_SRC = tests/graph_bfs_test.cpp
-DFS_TEST_SRC = tests/graph_dfs_test.cpp
-TARJAN_TEST_SRC = tests/graph_tarjan_test.cpp
-CONNECTION_TEST_SRC = tests/graph_connected_test.cpp
-
-INCLUDE = $( wildcard include/*.hpp )
+TESTS = classes iterator bfs dfs tarjan connected shortest_path
 
 
-#CLASS_TEST_OBJ = $(CLASS_TEST_SRC:.cpp=.o)
-#ITERATOR_TEST_OBJ = $(ITERATOR_TEST_SRC:.cpp=.o)
-#BFS_TEST_OBJ = $(BFS_TEST_SRC:.cpp=.o)
-#DFS_TEST_OBJ = $(DFS_TEST_SRC:.cpp=.o)
-
-OBJ = $(SRC:.cpp=.o)
-# Generate object files for every test file
+# Generate src tests variables
 $(foreach test,$(TESTS), \
-  $(eval $(test)_TEST_OBJ := $($(test)_TEST_SRC:.cpp=.o)) \
+	$(eval\
+		$(test)_test_src = tests/graph_$(test)_test.cpp \
+	)\
 )
 
-CLASS_TEST_EXE = $(EXE_DIR)/GraphTester.x
-ITERATOR_TEST_EXE = $(EXE_DIR)/IteratorTester.x
-BFS_TEST_EXE = $(EXE_DIR)/BFSTester.x
-DFS_TEST_EXE = $(EXE_DIR)/DFSTester.x
-TARJAN_TEST_EXE = $(EXE_DIR)/TarjanTester.x
-CONNECTION_TEST_EXE = $(EXE_DIR)/GraphConnectionTester.x
-# Generate executable rules for every test
+# Generate object files variables for tests
 $(foreach test,$(TESTS), \
-  $(eval $($(test)_TEST_EXE): $(OBJ) $($(test)_TEST_OBJ) $(INCLUDE) ; \
-  	mkdir -p $(EXE_DIR) ; \
-    $(CXX) $(CXXFLAGS) $(OBJ) $($(test)_TEST_OBJ) -o $$@) \
+	$(eval\
+		$(test)_test_obj = obj/graph_$(test)_test.o \
+	)\
 )
 
-#$(CLASS_TEST_EXE): $(OBJ) $(CLASS_TEST_OBJ) $(INCLUDE)
-#	$(CXX) $(CXXFLAGS) $(OBJ) $(CLASS_TEST_OBJ) -o $(CLASS_TEST_EXE)
-#
-#$(ITERATOR_TEST_EXE): $(OBJ) $(ITERATOR_TEST_OBJ) $(INCLUDE)
-#	$(CXX) $(CXXFLAGS) $(OBJ) $(ITERATOR_TEST_OBJ) -o $(ITERATOR_TEST_EXE)
-#
-#$(BFS_TEST_EXE): $(OBJ) $(BFS_TEST_OBJ) $(INCLUDE)
-#	$(CXX) $(CXXFLAGS) $(OBJ) $(BFS_TEST_OBJ) -o $(BFS_TEST_EXE)
-#
-#$(DFS_TEST_EXE): $(OBJ) $(DFS_TEST_OBJ) $(INCLUDE)
-#	$(CXX) $(CXXFLAGS) $(OBJ) $(DFS_TEST_OBJ) -o $(DFS_TEST_EXE)
+# Generate dependencies files variables for tests
+$(foreach test,$(TESTS), \
+	$(eval\
+		$(test)_test_dep = obj/graph_$(test)_test.d \
+	)\
+)
+
+# Generate names for executable files
+$(foreach test,$(TESTS), \
+	$(eval\
+		$(test)_test_exe = exe/graph_$(test)_test.x \
+	)\
+)
+
+# Rule for generating object files for tests
+obj/%.o: tests/%.cpp
+	mkdir -p obj
+	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
 
-.PHONY: run_class_test
-run_class_test: $(CLASS_TEST_EXE)
-	./$(CLASS_TEST_EXE)
+# Rule for including dependencies files for tests
+-include $(foreach test,$(TESTS),$($(test)_test_dep))
 
-.PHONY: run_iterator_test
-run_iterator_test: $(ITERATOR_TEST_EXE)
-	./$(ITERATOR_TEST_EXE)
+# Generate executable building rules for all tests
+$(foreach test,$(TESTS),$(eval \
+	$($(test)_test_exe): $($(test)_test_obj) $(LIB_OBJ);\
+		mkdir -p exe ;\
+		$(CXX) $(CXXFLAGS) $$^ -o $$@;\
+))
 
-.PHONY: run_bfs_test
-run_bfs_test: $(BFS_TEST_EXE)
-	./$(BFS_TEST_EXE)
+# Generate make run command for all test executables
+.PHONY: $(foreach test,$(TESTS),run_$(test)_test)
+$(foreach test,$(TESTS),$(eval \
+	run_$(test)_test : $($(test)_test_exe) ; \
+		./$($(test)_test_exe) \
+))
 
-.PHONY: run_dfs_test
-run_dfs_test: $(DFS_TEST_EXE)
-	./$(DFS_TEST_EXE)
+# Generate all rule
+all: $(foreach test,$(TESTS),$($(test)_test_exe))
 
-.PHONY: run_tarjan_test
-run_tarjan_test: $(TARJAN_TEST_EXE)
-	./$(TARJAN_TEST_EXE)
-
-.PHONY: run_connection_test
-run_connection_test: $(CONNECTION_TEST_EXE)
-	./$(CONNECTION_TEST_EXE)
-
-
-ZADANIE3i4_CONTENT := BaseGraph ListGraph MatrixGraph ReportMaker HelperFunctions GraphExceptions Edge
-ZADANIE5_CONTENT := BaseGraph ListGraph ReportMaker HelperFunctions GraphExceptions Edge DFS GraphSearchAlgorithm
-
-
-.PHONY: package_class_test
-package_class_test:
-	mkdir -p Zadanie3i4 Zadanie3i4/include Zadanie3i4/tests Zadanie3i4/lib zadania
-	-cp $(addprefix include/,$(addsuffix .hpp,$(ZADANIE3i4_CONTENT))) Zadanie3i4/include
-	-cp $(addprefix lib/,$(addsuffix .cpp,$(ZADANIE3i4_CONTENT))) Zadanie3i4/lib
-	cp tests/graph_classes_test.cpp Zadanie3i4/tests
-	cp other/Makefile graph_visualiser.py requirements.txt Zadanie3i4
-	tar -vczf zadania/Zadanie3i4.tar.gz Zadanie3i4
-	rm -rf Zadanie3i4
-
-.PHONY: package_dfs_test
-package_dfs_test:
-	mkdir -p Zadanie5 Zadanie5/include Zadanie5/tests Zadanie5/lib zadania
-	-cp $(addprefix include/,$(addsuffix .hpp,$(ZADANIE5_CONTENT))) Zadanie5/include
-	-cp $(addprefix lib/,$(addsuffix .cpp,$(ZADANIE5_CONTENT))) Zadanie5/lib
-	cp tests/graph_dfs_test.cpp Zadanie5/tests
-	cp other/Makefile graph_visualiser.py requirements.txt Zadanie5
-	tar -vczf zadania/Zadanie5.tar.gz Zadanie5
-	rm -rf Zadanie5
-
-
-# RUN TESTS
-.PHONY: test_graphs
-test_graphs: clean_json clean_img run_class_test
-
-.PHONY: test_iterators
-test_iterators: clean_json clean_img run_iterator_test
-
-.PHONY: test_bfs
-test_bfs: clean_json clean_img run_bfs_test
-
-.PHONY: test_dfs
-test_dfs: clean_json clean_img run_dfs_test
-
-.PHONY: test_tarjan
-test_tarjan: clean_json clean_img run_tarjan_test
-
-.PHONY: test_connection
-test_connection: clean_json clean_img run_connection_test
-
-#all: $(CLASS_TEST_EXE) $(ITERATOR_TEST_EXE) $(BFS_TEST_EXE) $(DFS_TEST_EXE)
-all: $(foreach test,$(TESTS),$($(test)_TEST_EXE))
-
-
-# PYTHON
-.PHONY: visualise
-visualise:
-	.venv/bin/python3 graph_visualiser.py
-	#python3 graph_visualiser.py
-
-# CLEANS
-.PHONY: clean
-clean:
-	rm -f tests/*.o
-	rm -f lib/*.o
-	rm -f exe/*.x
-
-.PHONY: clean_json
-clean_json:
-	rm -f json/*.json
-
-.PHONY: clean_img
-clean_img:
+clean_export:
 	rm -f img/*
-
-.PHONY: clean_report
-clean_report:
 	rm -f report/*
+	rm -f json/*
+
+clean:
+	rm -f obj/*.o
+	rm -f lib/*.o # TODO move lib obj files to obj folder
