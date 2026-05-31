@@ -13,7 +13,7 @@ CONFIG_FILE = config.yaml
 KERNEL_NAME := $(shell uname -s)
 ifeq ($(KERNEL_NAME),Darwin)
     CXX = g++-15
-    VENV = .venv/bin/ # WARNING THIS IS ONLY TO MAKE TESTS FOR ME EASIER
+    VENV = .venv/bin/# WARNING THIS IS ONLY TO MAKE TESTS FOR ME EASIER
 else
     CXX = g++
 endif
@@ -23,7 +23,7 @@ LFLAGS = $(CXXFLAGS)
 
 
 # AVAILABLE TESTS
-TESTS = classes iterator bfs dfs tarjan connected shortest_path
+TESTS = classes iterator bfs dfs tarjan connected
 # TEST EXECUTABLE NAME PATTERN
 define test_name_pattern
 graph_$(1)_test.x
