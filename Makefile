@@ -23,7 +23,7 @@ LFLAGS = $(CXXFLAGS)
 
 
 # AVAILABLE TESTS
-TESTS = classes iterator bfs dfs tarjan connected
+TESTS = classes iterator bfs dfs tarjan connected shortest_path
 # TEST EXECUTABLE NAME PATTERN
 define test_name_pattern
 graph_$(1)_test.x
@@ -102,6 +102,10 @@ test_$(1): $($(1)_test_exe) clnex
 endef
 $(foreach test,$(TESTS),$(eval $(call generate_run_target,$(test))))
 
+# Build visualiser executable from python script
+NUITKA_FLAGS = --onefile --product-version=0.1 --standalone
+build_visualiser:
+	$(VENV)python3 -m nuitka scripts/graph_visualiser.py $(NUITKA_FLAGS)
 
 
 # Generate all rule
