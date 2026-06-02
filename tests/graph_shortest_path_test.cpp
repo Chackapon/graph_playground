@@ -9,7 +9,7 @@
 constexpr int N = 10;
 
 int main() {
-    rand_init(42069);
+    rand_init();
     const auto r = new ReportMaker("report", "dijkstra");
     const auto graph = new ListGraph<int>();
     const auto algorithm = new Dijkstra<int, ListGraph<int>>(*graph);
